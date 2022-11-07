@@ -641,7 +641,7 @@ describe("Tokens smart contract", function () {
       );
       assert.equal(
         JSON.stringify(res.heAccounts),
-        '{"hive-engine":1,"swap-eth":1,"btc-swap":1,"graphene-swap":1,"honey-swap":1}'
+        '{"hive-engine":1,"swap-eth":1,"btc-swap":1,"graphene-swap":1,"sns-peg":1}'
       );
 
       refBlockNumber = fixture.getNextRefBlockNumber();
@@ -653,7 +653,7 @@ describe("Tokens smart contract", function () {
           CONSTANTS.STEEM_ENGINE_ACCOUNT,
           "tokens",
           "updateParams",
-          '{ "tokenCreationFee": "123", "heAccounts": {"hive-engine":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"honey-swap":1,"moartokens":1} }'
+          '{ "tokenCreationFee": "123", "heAccounts": {"hive-engine":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"sns-peg":1,"moartokens":1} }'
         )
       );
 
@@ -680,7 +680,7 @@ describe("Tokens smart contract", function () {
       );
       assert.equal(
         JSON.stringify(res.heAccounts),
-        '{"hive-engine":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"honey-swap":1,"moartokens":1}'
+        '{"hive-engine":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"sns-peg":1,"moartokens":1}'
       );
       assert.equal(res.tokenCreationFee, "123");
       assert.equal(res.enableDelegationFee, "1000");
@@ -774,7 +774,7 @@ describe("Tokens smart contract", function () {
           CONSTANTS.STEEM_ENGINE_ACCOUNT,
           "tokens",
           "updateParams",
-          '{ "heAccounts": {"hive-engine":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"honey-swap":1,"moartokens":1,"yetmore":1} }'
+          '{ "heAccounts": {"hive-engine":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"sns-peg":1,"moartokens":1,"yetmore":1} }'
         )
       );
 
@@ -802,7 +802,7 @@ describe("Tokens smart contract", function () {
       );
       assert.equal(
         JSON.stringify(res.heAccounts),
-        '{"snsofficial":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"honey-swap":1,"moartokens":1,"yetmore":1}'
+        '{"snsofficial":1,"lotsa-swap":1,"btc-swap":1,"graphene-swap":1,"sns-peg":1,"moartokens":1,"yetmore":1}'
       );
 
       resolve();

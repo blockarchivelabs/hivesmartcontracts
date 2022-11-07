@@ -28,7 +28,7 @@ const HE_ACCOUNTS = {
   "swap-eth": 1,
   "btc-swap": 1,
   "graphene-swap": 1,
-  "honey-swap": 1,
+  "sns-peg": 1,
 };
 
 const RESERVED_SYMBOLS = {
