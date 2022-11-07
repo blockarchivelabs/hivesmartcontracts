@@ -1,19 +1,17 @@
 {
-    "chainId": "mainnet-hive",
+    "chainId": "mainnet1",
     "rpcNodePort": 5000,
     "p2pPort": 5001,
     "databaseURL": "mongodb://127.0.0.1:27017",
-    "databaseName": "hsc",
+    "databaseName": "ssc",
     "blocksLogFilePath": "./blocks.log",
     "javascriptVMTimeout": 10000,
     "streamNodes": [
-        "https://api.deathwing.me",
-        "https://rpc.ecency.com",
-        "https://hived.emre.sh",
-        "https://api.openhive.network"
+        "https://api.steemit.com",
+        "https://api.upvu.org"
     ],
-    "startHiveBlock": 41967000,
-    "genesisHiveBlock": 41967000,
+    "startHiveBlock": 32890061,
+    "genesisHiveBlock": 32890061,
     "witnessEnabled": true,
     "defaultLogLevel": "warn",
     "lightNode": false,
