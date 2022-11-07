@@ -1,13 +1,13 @@
-const axios = require('axios');
-const log = require('loglevel');
-const { Block } = require('../libs/Block');
-const { Transaction } = require('../libs/Transaction');
-const { IPC } = require('../libs/IPC');
-const { Database } = require('../libs/Database');
-const { Bootstrap } = require('../contracts/bootstrap/Bootstrap');
+const axios = require("axios");
+const log = require("loglevel");
+const { Block } = require("../libs/Block");
+const { Transaction } = require("../libs/Transaction");
+const { IPC } = require("../libs/IPC");
+const { Database } = require("../libs/Database");
+const { Bootstrap } = require("../contracts/bootstrap/Bootstrap");
 
 const PLUGIN_PATH = require.resolve(__filename);
-const { PLUGIN_NAME, PLUGIN_ACTIONS } = require('./Blockchain.constants');
+const { PLUGIN_NAME, PLUGIN_ACTIONS } = require("./Blockchain.constants");
 
 const actions = {};
 
@@ -24,11 +24,30 @@ const createGenesisBlock = async (payload) => {
 
   if (!genesisBlock) {
     // insert the genesis block
-    const { chainId, genesisHiveBlock } = payload;
-    const genesisTransactions = await Bootstrap.getBootstrapTransactions(genesisHiveBlock);
-    genesisTransactions.unshift(new Transaction(genesisHiveBlock, 0, 'null', 'null', 'null', JSON.stringify({ chainId, genesisHiveBlock })));
+    const { chainId, genesisSteemBlock } = payload;
+    const genesisTransactions = await Bootstrap.getBootstrapTransactions(
+      genesisSteemBlock
+    );
+    genesisTransactions.unshift(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "null",
+        "null",
+        "null",
+        JSON.stringify({ chainId, genesisSteemBlock })
+      )
+    );
 
-    genesisBlock = new Block('2018-06-01T00:00:00', 0, '', '', genesisTransactions, -1, '0');
+    genesisBlock = new Block(
+      "2018-06-01T00:00:00",
+      0,
+      "",
+      "",
+      genesisTransactions,
+      -1,
+      "0"
+    );
     await genesisBlock.produceBlock(database, javascriptVMTimeout);
 
     await database.insertGenesisBlock(genesisBlock);
@@ -45,59 +64,87 @@ function addBlock(block) {
 
 function getRefBlockNumber(block) {
   if (block.otherHashChangeRefHiveBlocks) {
-    return block.otherHashChangeRefHiveBlocks[block.otherHashChangeRefHiveBlocks.length - 1];
+    return block.otherHashChangeRefHiveBlocks[
+      block.otherHashChangeRefHiveBlocks.length - 1
+    ];
   }
-  return block.refHiveBlockNumber;
+  return block.refSteemBlockNumber;
 }
 
 // produce all the pending transactions, that will result in the creation of a block
 async function producePendingTransactions(
-  refHiveBlockNumber, refHiveBlockId, prevRefHiveBlockId, transactions, timestamp,
+  refSteemBlockNumber,
+  refSteemBlockId,
+  prevRefSteemBlockId,
+  transactions,
+  timestamp
 ) {
   const previousBlock = await getLatestBlockMetadata();
   if (previousBlock) {
     // skip block if it has been parsed already
     const lastRefBlockNumber = getRefBlockNumber(previousBlock);
-    if (refHiveBlockNumber <= lastRefBlockNumber) {
+    if (refSteemBlockNumber <= lastRefBlockNumber) {
       // eslint-disable-next-line no-console
-      console.warn(`skipping Hive block ${refHiveBlockNumber} as it has already been parsed`);
+      console.warn(
+        `skipping Hive block ${refSteemBlockNumber} as it has already been parsed`
+      );
       return;
     }
 
     const newBlock = new Block(
       timestamp,
-      refHiveBlockNumber,
-      refHiveBlockId,
-      prevRefHiveBlockId,
+      refSteemBlockNumber,
+      refSteemBlockId,
+      prevRefSteemBlockId,
       transactions,
       previousBlock.blockNumber,
       previousBlock.hash,
-      previousBlock.databaseHash,
+      previousBlock.databaseHash
     );
 
     const session = database.startSession();
 
-    const mainBlock = !enableHashVerification ? null : (await axios({
-      url: 'https://api.hive-engine.com/rpc/blockchain',
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      data: {
-        jsonrpc: '2.0', id: 10, method: 'getBlockInfo', params: { blockNumber: newBlock.blockNumber },
-      },
-    })).data.result;
+    const mainBlock = !enableHashVerification
+      ? null
+      : (
+          await axios({
+            url: "https://localhost/rpc/blockchain",
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            data: {
+              jsonrpc: "2.0",
+              id: 10,
+              method: "getBlockInfo",
+              params: { blockNumber: newBlock.blockNumber },
+            },
+          })
+        ).data.result;
     try {
       await session.withTransaction(async () => {
         await newBlock.produceBlock(database, javascriptVMTimeout, mainBlock);
 
-        if (newBlock.transactions.length > 0 || newBlock.virtualTransactions.length > 0) {
+        if (
+          newBlock.transactions.length > 0 ||
+          newBlock.virtualTransactions.length > 0
+        ) {
           if (mainBlock && newBlock.hash) {
-            console.log(`Sidechain Block ${mainBlock.blockNumber}, Main db hash: ${mainBlock.databaseHash}, Main block hash: ${mainBlock.hash}, This db hash: ${newBlock.databaseHash}, This block hash: ${newBlock.hash}`); // eslint-disable-line no-console
+            console.log(
+              `Sidechain Block ${mainBlock.blockNumber}, Main db hash: ${mainBlock.databaseHash}, Main block hash: ${mainBlock.hash}, This db hash: ${newBlock.databaseHash}, This block hash: ${newBlock.hash}`
+            ); // eslint-disable-line no-console
 
-            if (mainBlock.databaseHash !== newBlock.databaseHash
-                || mainBlock.hash !== newBlock.hash) {
-              throw new Error(`Block mismatch with api \nMain: ${JSON.stringify(mainBlock, null, 2)}, \nThis: ${JSON.stringify(newBlock, null, 2)}`);
+            if (
+              mainBlock.databaseHash !== newBlock.databaseHash ||
+              mainBlock.hash !== newBlock.hash
+            ) {
+              throw new Error(
+                `Block mismatch with api \nMain: ${JSON.stringify(
+                  mainBlock,
+                  null,
+                  2
+                )}, \nThis: ${JSON.stringify(newBlock, null, 2)}`
+              );
             }
           }
 
@@ -111,7 +158,7 @@ async function producePendingTransactions(
       await database.endSession();
     }
   } else {
-    throw new Error('block not found');
+    throw new Error("block not found");
   }
 }
 
@@ -120,29 +167,43 @@ const produceNewBlockSync = async (block, callback = null) => {
   producing = true;
   // the stream parsed transactions from the Hive blockchain
   const {
-    refHiveBlockNumber, refHiveBlockId, prevRefHiveBlockId,
-    transactions, timestamp, virtualTransactions, replay,
+    refSteemBlockNumber,
+    refSteemBlockId,
+    prevRefSteemBlockId,
+    transactions,
+    timestamp,
+    virtualTransactions,
+    replay,
   } = block;
   const newTransactions = [];
 
   transactions.forEach((transaction) => {
     const finalTransaction = transaction;
 
-    newTransactions.push(new Transaction(
-      finalTransaction.refHiveBlockNumber,
-      finalTransaction.transactionId,
-      finalTransaction.sender,
-      finalTransaction.contract,
-      finalTransaction.action,
-      finalTransaction.payload,
-    ));
+    newTransactions.push(
+      new Transaction(
+        finalTransaction.refSteemBlockNumber,
+        finalTransaction.transactionId,
+        finalTransaction.sender,
+        finalTransaction.contract,
+        finalTransaction.action,
+        finalTransaction.payload
+      )
+    );
   });
 
   // if there are transactions pending we produce a block
-  if (newTransactions.length > 0
-     || (virtualTransactions && virtualTransactions.length > 0) || replay) {
+  if (
+    newTransactions.length > 0 ||
+    (virtualTransactions && virtualTransactions.length > 0) ||
+    replay
+  ) {
     await producePendingTransactions(
-      refHiveBlockNumber, refHiveBlockId, prevRefHiveBlockId, newTransactions, timestamp,
+      refSteemBlockNumber,
+      refSteemBlockId,
+      prevRefSteemBlockId,
+      newTransactions,
+      timestamp
     );
   }
   producing = false;
@@ -163,15 +224,10 @@ function stop(callback) {
 }
 
 const init = async (conf, callback) => {
-  const {
-    databaseURL,
-    databaseName,
-    lightNode,
-    blocksToKeep,
-  } = conf;
+  const { databaseURL, databaseName, lightNode, blocksToKeep } = conf;
   javascriptVMTimeout = conf.javascriptVMTimeout; // eslint-disable-line prefer-destructuring
   enableHashVerification = conf.enableHashVerification; // eslint-disable-line prefer-destructuring
-  log.setDefaultLevel(conf.defaultLogLevel ? conf.defaultLogLevel : 'warn');
+  log.setDefaultLevel(conf.defaultLogLevel ? conf.defaultLogLevel : "warn");
 
   database = new Database();
   await database.init(databaseURL, databaseName, lightNode, blocksToKeep);
@@ -188,21 +244,21 @@ ipc.onReceiveMessage((message) => {
     // from,
   } = message;
 
-  if (action === 'init') {
+  if (action === "init") {
     init(payload, (res) => {
-      console.log('successfully initialized'); // eslint-disable-line no-console
+      console.log("successfully initialized"); // eslint-disable-line no-console
       ipc.reply(message, res);
     });
-  } else if (action === 'stop') {
+  } else if (action === "stop") {
     stop(() => {
-      console.log('successfully stopped'); // eslint-disable-line no-console
+      console.log("successfully stopped"); // eslint-disable-line no-console
       ipc.reply(message);
     });
   } else if (action === PLUGIN_ACTIONS.PRODUCE_NEW_BLOCK_SYNC) {
     produceNewBlockSync(payload, () => {
       ipc.reply(message);
     });
-  } else if (action && typeof actions[action] === 'function') {
+  } else if (action && typeof actions[action] === "function") {
     ipc.reply(message, actions[action](payload));
   } else {
     ipc.reply(message);

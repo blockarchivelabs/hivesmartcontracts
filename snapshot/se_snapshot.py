@@ -10,7 +10,7 @@ from decimal import *
 
 apiUrl = 'https://api.steem-engine.com/rpc2/contracts/'
 
-excludedAccounts = { 'null': 1, 'steemsc': 1, 'steem-tokens': 1, 'steem-peg': 1, 'deepcrypto8': 1 }
+excludedAccounts = { 'null': 1, 'steemsc': 1, 'steem-tokens': 1, 'sns-peg': 1, 'deepcrypto8': 1 }
 
 # start parsing command line arguments
 parser = argparse.ArgumentParser()

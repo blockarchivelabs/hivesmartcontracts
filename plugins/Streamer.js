@@ -1,13 +1,13 @@
-const dhive = require('@hiveio/dhive');
-const { Queue } = require('../libs/Queue');
-const { Transaction } = require('../libs/Transaction');
-const { IPC } = require('../libs/IPC');
-const { Database } = require('../libs/Database');
-const BC_PLUGIN_NAME = require('./Blockchain.constants').PLUGIN_NAME;
-const BC_PLUGIN_ACTIONS = require('./Blockchain.constants').PLUGIN_ACTIONS;
+const dhive = require("@hiveio/dhive");
+const { Queue } = require("../libs/Queue");
+const { Transaction } = require("../libs/Transaction");
+const { IPC } = require("../libs/IPC");
+const { Database } = require("../libs/Database");
+const BC_PLUGIN_NAME = require("./Blockchain.constants").PLUGIN_NAME;
+const BC_PLUGIN_ACTIONS = require("./Blockchain.constants").PLUGIN_ACTIONS;
 
 const PLUGIN_PATH = require.resolve(__filename);
-const { PLUGIN_NAME, PLUGIN_ACTIONS } = require('./Streamer.constants');
+const { PLUGIN_NAME, PLUGIN_ACTIONS } = require("./Streamer.constants");
 
 const ipc = new IPC(PLUGIN_NAME);
 let client = null;
@@ -15,7 +15,7 @@ let clients = null;
 let database = null;
 class ForkException {
   constructor(message) {
-    this.error = 'ForkException';
+    this.error = "ForkException";
     this.message = message;
   }
 }
@@ -25,7 +25,7 @@ let hiveHeadBlockNumber = 0;
 let stopStream = false;
 const antiForkBufferMaxSize = 2;
 const buffer = new Queue(antiForkBufferMaxSize);
-let chainIdentifier = '';
+let chainIdentifier = "";
 let blockStreamerHandler = null;
 let updaterGlobalPropsHandler = null;
 let lastBlockSentToBlockchain = 0;
@@ -60,11 +60,12 @@ const parseTransactions = (refBlockNumber, block) => {
     for (let indexOp = 0; indexOp < nbOperations; indexOp += 1) {
       const operation = block.transactions[i].operations[indexOp];
 
-      if (operation[0] === 'custom_json'
-        || operation[0] === 'transfer'
-        || operation[0] === 'comment'
-        || operation[0] === 'comment_options'
-        || operation[0] === 'vote'
+      if (
+        operation[0] === "custom_json" ||
+        operation[0] === "transfer" ||
+        operation[0] === "comment" ||
+        operation[0] === "comment_options" ||
+        operation[0] === "vote"
       ) {
         try {
           let id = null;
@@ -75,7 +76,7 @@ const parseTransactions = (refBlockNumber, block) => {
           let sscTransactions = [];
           let isSignedWithActiveKey = null;
 
-          if (operation[0] === 'custom_json') {
+          if (operation[0] === "custom_json") {
             id = operation[1].id; // eslint-disable-line prefer-destructuring
             if (operation[1].required_auths.length > 0) {
               sender = operation[1].required_auths[0]; // eslint-disable-line
@@ -86,7 +87,7 @@ const parseTransactions = (refBlockNumber, block) => {
             }
             let jsonObj = JSON.parse(operation[1].json); // eslint-disable-line
             sscTransactions = Array.isArray(jsonObj) ? jsonObj : [jsonObj];
-          } else if (operation[0] === 'transfer') {
+          } else if (operation[0] === "transfer") {
             isSignedWithActiveKey = true;
             sender = operation[1].from;
             recipient = operation[1].to;
@@ -94,14 +95,20 @@ const parseTransactions = (refBlockNumber, block) => {
             const transferParams = JSON.parse(operation[1].memo);
             id = transferParams.id; // eslint-disable-line prefer-destructuring
             // multi transactions is not supported for the Hive transfers
-            if (Array.isArray(transferParams.json) && transferParams.json.length === 1) {
+            if (
+              Array.isArray(transferParams.json) &&
+              transferParams.json.length === 1
+            ) {
               sscTransactions = transferParams.json;
             } else if (!Array.isArray(transferParams.json)) {
               sscTransactions = [transferParams.json];
             }
-          } else if (operation[0] === 'comment') {
+          } else if (operation[0] === "comment") {
             sender = operation[1].author;
-            const commentMeta = operation[1].json_metadata !== '' ? JSON.parse(operation[1].json_metadata) : null;
+            const commentMeta =
+              operation[1].json_metadata !== ""
+                ? JSON.parse(operation[1].json_metadata)
+                : null;
 
             if (commentMeta && commentMeta.ssc) {
               id = commentMeta.ssc.id; // eslint-disable-line prefer-destructuring
@@ -112,7 +119,8 @@ const parseTransactions = (refBlockNumber, block) => {
                 const commentBody = JSON.parse(operation[1].body);
                 id = commentBody.id; // eslint-disable-line prefer-destructuring
                 sscTransactions = Array.isArray(commentBody.json)
-                  ? commentBody.json : [commentBody.json];
+                  ? commentBody.json
+                  : [commentBody.json];
               } catch (e) {
                 // If this fails to parse, treat as a comment op, only after specified block
                 if (refBlockNumber >= 54106800) {
@@ -120,8 +128,8 @@ const parseTransactions = (refBlockNumber, block) => {
                   permlink = operation[1].permlink; // eslint-disable-line prefer-destructuring
                   sscTransactions = [
                     {
-                      contractName: 'comments',
-                      contractAction: 'comment',
+                      contractName: "comments",
+                      contractAction: "comment",
                       contractPayload: {
                         author: operation[1].author,
                         jsonMetadata: commentMeta,
@@ -133,27 +141,33 @@ const parseTransactions = (refBlockNumber, block) => {
                 }
               }
             }
-          } else if (operation[0] === 'comment_options') {
+          } else if (operation[0] === "comment_options") {
             id = `ssc-${chainIdentifier}`;
-            sender = 'null';
+            sender = "null";
             permlink = operation[1].permlink; // eslint-disable-line prefer-destructuring
 
             const extensions = operation[1].extensions; // eslint-disable-line prefer-destructuring
             let beneficiaries = [];
-            if (extensions
-              && extensions[0] && extensions[0].length > 1
-              && extensions[0][1].beneficiaries) {
+            if (
+              extensions &&
+              extensions[0] &&
+              extensions[0].length > 1 &&
+              extensions[0][1].beneficiaries
+            ) {
               beneficiaries = extensions[0][1].beneficiaries; // eslint-disable-line
-            } else if (extensions
-              && extensions[0] && extensions[0].value
-              && extensions[0].value.beneficiaries) {
+            } else if (
+              extensions &&
+              extensions[0] &&
+              extensions[0].value &&
+              extensions[0].value.beneficiaries
+            ) {
               beneficiaries = extensions[0].value.beneficiaries; // eslint-disable-line
             }
 
             sscTransactions = [
               {
-                contractName: 'comments',
-                contractAction: 'commentOptions',
+                contractName: "comments",
+                contractAction: "commentOptions",
                 contractPayload: {
                   author: operation[1].author,
                   maxAcceptedPayout: operation[1].max_accepted_payout,
@@ -163,15 +177,15 @@ const parseTransactions = (refBlockNumber, block) => {
                 },
               },
             ];
-          } else if (operation[0] === 'vote') {
+          } else if (operation[0] === "vote") {
             id = `ssc-${chainIdentifier}`;
-            sender = 'null';
+            sender = "null";
             permlink = operation[1].permlink; // eslint-disable-line prefer-destructuring
 
             sscTransactions = [
               {
-                contractName: 'comments',
-                contractAction: 'vote',
+                contractName: "comments",
+                contractAction: "vote",
                 contractPayload: {
                   voter: operation[1].voter,
                   author: operation[1].author,
@@ -181,17 +195,27 @@ const parseTransactions = (refBlockNumber, block) => {
             ];
           }
 
-          if (id && id === `ssc-${chainIdentifier}` && sscTransactions.length > 0) {
+          if (
+            id &&
+            id === `ssc-${chainIdentifier}` &&
+            sscTransactions.length > 0
+          ) {
             const nbTransactions = sscTransactions.length;
             for (let index = 0; index < nbTransactions; index += 1) {
               const sscTransaction = sscTransactions[index];
 
-              const { contractName, contractAction, contractPayload } = sscTransaction;
-              if (contractName && typeof contractName === 'string'
-                && contractAction && typeof contractAction === 'string'
-                && contractPayload && typeof contractPayload === 'object') {
+              const { contractName, contractAction, contractPayload } =
+                sscTransaction;
+              if (
+                contractName &&
+                typeof contractName === "string" &&
+                contractAction &&
+                typeof contractAction === "string" &&
+                contractPayload &&
+                typeof contractPayload === "object"
+              ) {
                 contractPayload.recipient = recipient;
-                contractPayload.amountHIVEHBD = amount;
+                contractPayload.amountSTEEMSBD = amount;
                 contractPayload.isSignedWithActiveKey = isSignedWithActiveKey;
                 contractPayload.permlink = permlink;
 
@@ -200,7 +224,7 @@ const parseTransactions = (refBlockNumber, block) => {
                 }
 
                 if (amount === null) {
-                  delete contractPayload.amountHIVEHBD;
+                  delete contractPayload.amountSTEEMSBD;
                 }
 
                 if (isSignedWithActiveKey === null) {
@@ -220,9 +244,13 @@ const parseTransactions = (refBlockNumber, block) => {
 
                 // set the sender to null when calling the comment action
                 // this way we allow people to create comments only via the comment operation
-                if (operation[0] === 'comment' && contractName === 'comments' && contractAction === 'comment') {
+                if (
+                  operation[0] === "comment" &&
+                  contractName === "comments" &&
+                  contractAction === "comment"
+                ) {
                   contractPayload.author = sender;
-                  sender = 'null';
+                  sender = "null";
                 }
 
                 // if multi transactions
@@ -259,8 +287,8 @@ const parseTransactions = (refBlockNumber, block) => {
                     sender,
                     contractName,
                     contractAction,
-                    JSON.stringify(contractPayload),
-                  ),
+                    JSON.stringify(contractPayload)
+                  )
                 );
               }
             }
@@ -275,9 +303,12 @@ const parseTransactions = (refBlockNumber, block) => {
   return newTransactions;
 };
 
-const sendBlock = block => ipc.send(
-  { to: BC_PLUGIN_NAME, action: BC_PLUGIN_ACTIONS.PRODUCE_NEW_BLOCK_SYNC, payload: block },
-);
+const sendBlock = (block) =>
+  ipc.send({
+    to: BC_PLUGIN_NAME,
+    action: BC_PLUGIN_ACTIONS.PRODUCE_NEW_BLOCK_SYNC,
+    payload: block,
+  });
 
 const getLatestBlockMetadata = () => database.getLatestBlockMetadata();
 
@@ -285,19 +316,14 @@ const getLatestBlockMetadata = () => database.getLatestBlockMetadata();
 const processBlock = async (block) => {
   if (stopStream) return;
 
-  await sendBlock(
-    {
-      // we timestamp the block with the Hive block timestamp
-      timestamp: block.timestamp,
-      refHiveBlockNumber: block.blockNumber,
-      refHiveBlockId: block.block_id,
-      prevRefHiveBlockId: block.previous,
-      transactions: parseTransactions(
-        block.blockNumber,
-        block,
-      ),
-    },
-  );
+  await sendBlock({
+    // we timestamp the block with the Hive block timestamp
+    timestamp: block.timestamp,
+    refSteemBlockNumber: block.blockNumber,
+    refSteemBlockId: block.block_id,
+    prevRefSteemBlockId: block.previous,
+    transactions: parseTransactions(block.blockNumber, block),
+  });
 
   lastBlockSentToBlockchain = block.blockNumber;
 };
@@ -309,15 +335,25 @@ const updateGlobalProps = async () => {
       hiveHeadBlockNumber = globProps.head_block_number;
       const delta = hiveHeadBlockNumber - currentHiveBlock;
       // eslint-disable-next-line no-console
-      console.log(`head_block_number ${hiveHeadBlockNumber}`, `currentBlock ${currentHiveBlock}`, `Hive blockchain is ${delta > 0 ? delta : 0} blocks ahead`);
+      console.log(
+        `head_block_number ${hiveHeadBlockNumber}`,
+        `currentBlock ${currentHiveBlock}`,
+        `Hive blockchain is ${delta > 0 ? delta : 0} blocks ahead`
+      );
       const nodes = Object.keys(totalRequests);
       nodes.forEach((node) => {
         // eslint-disable-next-line no-console
-        console.log(`Node block fetch average for ${node} is ${totalTime[node] / totalRequests[node]} with ${totalRequests[node]} requests`);
+        console.log(
+          `Node block fetch average for ${node} is ${
+            totalTime[node] / totalRequests[node]
+          } with ${totalRequests[node]} requests`
+        );
       });
     }
   } catch (ex) {
-    console.error('An error occured while trying to fetch the Hive blockchain global properties'); // eslint-disable-line no-console
+    console.error(
+      "An error occured while trying to fetch the Hive blockchain global properties"
+    ); // eslint-disable-line no-console
   }
   updaterGlobalPropsHandler = setTimeout(() => updateGlobalProps(), 10000);
 };
@@ -350,7 +386,11 @@ const throttledGetBlockFromNode = async (blockNumber, node) => {
       totalTime[node] += Date.now() - timeStart;
     } catch (err) {
       // eslint-disable-next-line no-console
-      console.error(`Error fetching block ${blockNumber} on node ${node}, took ${Date.now() - timeStart} ms`);
+      console.error(
+        `Error fetching block ${blockNumber} on node ${node}, took ${
+          Date.now() - timeStart
+        } ms`
+      );
       // eslint-disable-next-line no-console
       console.error(err);
     }
@@ -384,10 +424,9 @@ const throttledGetBlock = async (blockNumber) => {
       }
     }
   }
-  await new Promise(resolve => pendingRequests.push(resolve));
+  await new Promise((resolve) => pendingRequests.push(resolve));
   return throttledGetBlock(blockNumber);
 };
-
 
 // start at index 1, and rotate.
 const lookaheadBufferSize = 100;
@@ -399,7 +438,9 @@ const getBlock = async (blockNumber) => {
   let scanIndex = lookaheadStartIndex;
   for (let i = 0; i < lookaheadBufferSize; i += 1) {
     if (!blockLookaheadBuffer[scanIndex]) {
-      blockLookaheadBuffer[scanIndex] = throttledGetBlock(lookaheadStartBlock + i);
+      blockLookaheadBuffer[scanIndex] = throttledGetBlock(
+        lookaheadStartBlock + i
+      );
     }
     scanIndex += 1;
     if (scanIndex >= lookaheadBufferSize) scanIndex -= lookaheadBufferSize;
@@ -432,7 +473,9 @@ const streamBlocks = async (reject) => {
           addBlockToBuf = true;
         } else {
           buffer.clear();
-          const msg = `a fork happened between block ${currentHiveBlock - 1} and block ${currentHiveBlock}`;
+          const msg = `a fork happened between block ${
+            currentHiveBlock - 1
+          } and block ${currentHiveBlock}`;
           currentHiveBlock = lastBlockSentToBlockchain + 1;
           throw new ForkException(msg);
         }
@@ -443,7 +486,11 @@ const streamBlocks = async (reject) => {
         if (prevBlock && prevBlock.block_id === block.previous) {
           addBlockToBuf = true;
         } else {
-          throw new ForkException(`a fork happened between block ${currentHiveBlock - 1} and block ${currentHiveBlock}`);
+          throw new ForkException(
+            `a fork happened between block ${
+              currentHiveBlock - 1
+            } and block ${currentHiveBlock}`
+          );
         }
       }
 
@@ -454,7 +501,8 @@ const streamBlocks = async (reject) => {
       currentHiveBlock += 1;
       blockLookaheadBuffer[lookaheadStartIndex] = null;
       lookaheadStartIndex += 1;
-      if (lookaheadStartIndex >= lookaheadBufferSize) lookaheadStartIndex -= lookaheadBufferSize;
+      if (lookaheadStartIndex >= lookaheadBufferSize)
+        lookaheadStartIndex -= lookaheadBufferSize;
       lookaheadStartBlock += 1;
       streamBlocks(reject);
     } else {
@@ -478,12 +526,8 @@ const initHiveClient = (streamNodes, node) => {
 };
 
 const startStreaming = (conf) => {
-  const {
-    streamNodes,
-    chainId,
-    startHiveBlock,
-  } = conf;
-  currentHiveBlock = startHiveBlock;
+  const { streamNodes, chainId, startSteemBlock } = conf;
+  currentHiveBlock = startSteemBlock;
   lookaheadStartIndex = 0;
   lookaheadStartBlock = currentHiveBlock;
   blockLookaheadBuffer = Array(lookaheadBufferSize);
@@ -491,41 +535,47 @@ const startStreaming = (conf) => {
   const node = streamNodes[0];
   initHiveClient(streamNodes, node);
 
-  return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-    console.log('Starting Hive streaming at ', node); // eslint-disable-line no-console
+  return new Promise((resolve, reject) => {
+    // eslint-disable-line no-unused-vars
+    console.log("Starting Hive streaming at ", node); // eslint-disable-line no-console
 
     streamBlocks(reject);
   }).catch((err) => {
-    console.error('Stream error:', err.message, 'with', node); // eslint-disable-line no-console
+    console.error("Stream error:", err.message, "with", node); // eslint-disable-line no-console
     streamNodes.push(streamNodes.shift());
-    startStreaming(Object.assign({}, conf, { startHiveBlock: getCurrentBlock() }));
+    startStreaming(
+      Object.assign({}, conf, { startSteemBlock: getCurrentBlock() })
+    );
   });
 };
 
 function getRefBlockNumber(block) {
   if (block.otherHashChangeRefHiveBlocks) {
-    return block.otherHashChangeRefHiveBlocks[block.otherHashChangeRefHiveBlocks.length - 1];
+    return block.otherHashChangeRefHiveBlocks[
+      block.otherHashChangeRefHiveBlocks.length - 1
+    ];
   }
-  return block.refHiveBlockNumber;
+  return block.refSteemBlockNumber;
 }
 
 // stream the Hive blockchain to find transactions related to the sidechain
 const init = async (conf) => {
-  const {
-    databaseURL,
-    databaseName,
-  } = conf;
+  const { databaseURL, databaseName } = conf;
   const finalConf = conf;
 
   database = new Database();
   await database.init(databaseURL, databaseName);
-  // get latest block metadata to ensure that startHiveBlock saved in the config.json is not lower
+  // get latest block metadata to ensure that startSteemBlock saved in the config.json is not lower
   const block = await getLatestBlockMetadata();
   if (block) {
     const refBlockNumber = getRefBlockNumber(block);
-    if (finalConf.startHiveBlock < refBlockNumber) {
-      console.log(`adjusted startHiveBlock automatically to block ${refBlockNumber + 1} as it was lower than the refHiveBlockNumber available`); // eslint-disable-line no-console
-      finalConf.startHiveBlock = refBlockNumber + 1;
+    if (finalConf.startSteemBlock < refBlockNumber) {
+      console.log(
+        `adjusted startSteemBlock automatically to block ${
+          refBlockNumber + 1
+        } as it was lower than the refSteemBlockNumber available`
+      ); // eslint-disable-line no-console
+      finalConf.startSteemBlock = refBlockNumber + 1;
     }
   }
 
@@ -541,14 +591,14 @@ ipc.onReceiveMessage((message) => {
   } = message;
 
   switch (action) {
-    case 'init':
+    case "init":
       init(payload);
       ipc.reply(message);
-      console.log('successfully initialized'); // eslint-disable-line no-console
+      console.log("successfully initialized"); // eslint-disable-line no-console
       break;
-    case 'stop':
+    case "stop":
       ipc.reply(message, stop());
-      console.log('successfully stopped'); // eslint-disable-line no-console
+      console.log("successfully stopped"); // eslint-disable-line no-console
       break;
     case PLUGIN_ACTIONS.GET_CURRENT_BLOCK:
       ipc.reply(message, getCurrentBlock());

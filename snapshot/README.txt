@@ -22,7 +22,7 @@ optional arguments:
 Snapshots take into account open market orders, stakes, delegations, pending unstakes,
 and pending undelegations. The following accounts are excluded from each snapshot:
 
-null, steemsc, steem-tokens, steem-peg, and deepcrypto8
+null, steemsc, steem-tokens, sns-peg, and deepcrypto8
 
 In addition, the issuing account for each token is also excluded, since most likely
 that's the account you would want to do an airdrop from on the Hive Engine side

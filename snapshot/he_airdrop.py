@@ -12,7 +12,7 @@ from steemengine.tokenobject import Token
 from decimal import *
 
 
-heRpcUrl = 'https://api.hive-engine.com/rpc/'
+heRpcUrl = 'https://localhost/rpc/'
 hiveNode = 'https://api.hive.blog'
 chainId = 'ssc-mainnet-hive'
 

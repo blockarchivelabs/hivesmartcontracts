@@ -6,14 +6,14 @@
 /* global actions, api */
 
 // BEE tokens on Hive Engine, ENG on Steem Engine, and SSC on the testnet
-const UTILITY_TOKEN_SYMBOL = 'BEE';
+const UTILITY_TOKEN_SYMBOL = "ENG";
 
-// either SWAP.HIVE or STEEMP
-const BASE_SYMBOL = 'SWAP.HIVE';
+// either STEEMP or STEEMP
+const BASE_SYMBOL = "STEEMP";
 const BASE_SYMBOL_PRECISION = 8;
 
 // either HIVE or STEEM
-const CHAIN_TYPE = 'HIVE';
+const CHAIN_TYPE = "STEEM";
 
 actions.updateParams = async (payload) => {
   if (api.sender !== api.owner) return;
@@ -32,63 +32,116 @@ actions.updateParams = async (payload) => {
     premiumMaxTicksPerBlock,
   } = payload;
 
-  const params = await api.db.findOne('params', {});
+  const params = await api.db.findOne("params", {});
 
-  if (basicFee && typeof basicFee === 'string' && !api.BigNumber(basicFee).isNaN() && api.BigNumber(basicFee).gte(0)) {
+  if (
+    basicFee &&
+    typeof basicFee === "string" &&
+    !api.BigNumber(basicFee).isNaN() &&
+    api.BigNumber(basicFee).gte(0)
+  ) {
     params.basicFee = basicFee;
   }
-  if (basicSettingsFee && typeof basicSettingsFee === 'string' && !api.BigNumber(basicSettingsFee).isNaN() && api.BigNumber(basicSettingsFee).gte(0)) {
+  if (
+    basicSettingsFee &&
+    typeof basicSettingsFee === "string" &&
+    !api.BigNumber(basicSettingsFee).isNaN() &&
+    api.BigNumber(basicSettingsFee).gte(0)
+  ) {
     params.basicSettingsFee = basicSettingsFee;
   }
-  if (premiumFee && typeof premiumFee === 'string' && !api.BigNumber(premiumFee).isNaN() && api.BigNumber(premiumFee).gte(0)) {
+  if (
+    premiumFee &&
+    typeof premiumFee === "string" &&
+    !api.BigNumber(premiumFee).isNaN() &&
+    api.BigNumber(premiumFee).gte(0)
+  ) {
     params.premiumFee = premiumFee;
   }
-  if (premiumBaseStake && typeof premiumBaseStake === 'string' && !api.BigNumber(premiumBaseStake).isNaN() && api.BigNumber(premiumBaseStake).gte(0)) {
+  if (
+    premiumBaseStake &&
+    typeof premiumBaseStake === "string" &&
+    !api.BigNumber(premiumBaseStake).isNaN() &&
+    api.BigNumber(premiumBaseStake).gte(0)
+  ) {
     params.premiumBaseStake = premiumBaseStake;
   }
-  if (stakePerMarket && typeof stakePerMarket === 'string' && !api.BigNumber(stakePerMarket).isNaN() && api.BigNumber(stakePerMarket).gte(0)) {
+  if (
+    stakePerMarket &&
+    typeof stakePerMarket === "string" &&
+    !api.BigNumber(stakePerMarket).isNaN() &&
+    api.BigNumber(stakePerMarket).gte(0)
+  ) {
     params.stakePerMarket = stakePerMarket;
   }
-  if (basicDurationBlocks && typeof basicDurationBlocks === 'number' && Number.isInteger(basicDurationBlocks) && basicDurationBlocks >= 0) {
+  if (
+    basicDurationBlocks &&
+    typeof basicDurationBlocks === "number" &&
+    Number.isInteger(basicDurationBlocks) &&
+    basicDurationBlocks >= 0
+  ) {
     params.basicDurationBlocks = basicDurationBlocks;
   }
-  if (basicCooldownBlocks && typeof basicCooldownBlocks === 'number' && Number.isInteger(basicCooldownBlocks) && basicCooldownBlocks >= 0) {
+  if (
+    basicCooldownBlocks &&
+    typeof basicCooldownBlocks === "number" &&
+    Number.isInteger(basicCooldownBlocks) &&
+    basicCooldownBlocks >= 0
+  ) {
     params.basicCooldownBlocks = basicCooldownBlocks;
   }
-  if (basicMinTickIntervalBlocks && typeof basicMinTickIntervalBlocks === 'number' && Number.isInteger(basicMinTickIntervalBlocks) && basicMinTickIntervalBlocks >= 0) {
+  if (
+    basicMinTickIntervalBlocks &&
+    typeof basicMinTickIntervalBlocks === "number" &&
+    Number.isInteger(basicMinTickIntervalBlocks) &&
+    basicMinTickIntervalBlocks >= 0
+  ) {
     params.basicMinTickIntervalBlocks = basicMinTickIntervalBlocks;
   }
-  if (premiumMinTickIntervalBlocks && typeof premiumMinTickIntervalBlocks === 'number' && Number.isInteger(premiumMinTickIntervalBlocks) && premiumMinTickIntervalBlocks >= 0) {
+  if (
+    premiumMinTickIntervalBlocks &&
+    typeof premiumMinTickIntervalBlocks === "number" &&
+    Number.isInteger(premiumMinTickIntervalBlocks) &&
+    premiumMinTickIntervalBlocks >= 0
+  ) {
     params.premiumMinTickIntervalBlocks = premiumMinTickIntervalBlocks;
   }
-  if (basicMaxTicksPerBlock && typeof basicMaxTicksPerBlock === 'number' && Number.isInteger(basicMaxTicksPerBlock) && basicMaxTicksPerBlock >= 0) {
+  if (
+    basicMaxTicksPerBlock &&
+    typeof basicMaxTicksPerBlock === "number" &&
+    Number.isInteger(basicMaxTicksPerBlock) &&
+    basicMaxTicksPerBlock >= 0
+  ) {
     params.basicMaxTicksPerBlock = basicMaxTicksPerBlock;
   }
-  if (premiumMaxTicksPerBlock && typeof premiumMaxTicksPerBlock === 'number' && Number.isInteger(premiumMaxTicksPerBlock) && premiumMaxTicksPerBlock >= 0) {
+  if (
+    premiumMaxTicksPerBlock &&
+    typeof premiumMaxTicksPerBlock === "number" &&
+    Number.isInteger(premiumMaxTicksPerBlock) &&
+    premiumMaxTicksPerBlock >= 0
+  ) {
     params.premiumMaxTicksPerBlock = premiumMaxTicksPerBlock;
   }
 
-  await api.db.update('params', params);
+  await api.db.update("params", params);
 };
 
 // ----- START UTILITY FUNCTIONS -----
 
 const getCurrentTimestamp = () => {
-  const blockTimestamp = (CHAIN_TYPE === 'HIVE') ? api.hiveBlockTimestamp : api.steemBlockTimestamp;
+  const blockTimestamp =
+    CHAIN_TYPE === "STEEM ? api.steemBlockTimestamp : api.steemBlockTimestamp;
   return new Date(`${blockTimestamp}.000Z`).getTime();
 };
 
 const upgradeUserSchema = async () => {
-  const params = await api.db.findOne('params', {});
+  const params = await api.db.findOne("params", {});
 
-  let usersToCheck = await api.db.find(
-    'users',
-    {
-      timeLimitBlocks: {
-        $exists: true,
-      },
+  let usersToCheck = await api.db.find("users", {
+    timeLimitBlocks: {
+      $exists: true,
     },
-  );
+  });
 
   let nbUsers = usersToCheck.length;
   while (nbUsers > 0) {
@@ -98,71 +151,82 @@ const upgradeUserSchema = async () => {
       user.lastTickBlock = api.blockNumber;
       user.timeLimit = params.basicDurationBlocks * 3 * 1000;
       delete user.timeLimitBlocks;
-      await api.db.update('users', user, { timeLimitBlocks: '' });
+      await api.db.update("users", user, { timeLimitBlocks: "" });
     }
 
-    usersToCheck = await api.db.find(
-      'users',
-      {
-        timeLimitBlocks: {
-          $exists: true,
-        },
+    usersToCheck = await api.db.find("users", {
+      timeLimitBlocks: {
+        $exists: true,
       },
-    );
+    });
 
     nbUsers = usersToCheck.length;
   }
 };
 
 const upgradeMarketSchema = async () => {
-  let mktsToCheck = await api.db.find(
-    'markets',
-    {
-      placeAtBidWall: {
-        $exists: false,
-      },
+  let mktsToCheck = await api.db.find("markets", {
+    placeAtBidWall: {
+      $exists: false,
     },
-  );
+  });
 
   let nbMkts = mktsToCheck.length;
   while (nbMkts > 0) {
     for (let index = 0; index < nbMkts; index += 1) {
       const market = mktsToCheck[index];
-      market.placeAtBidWall = '10000';
-      market.placeAtSellWall = '10000';
-      await api.db.update('markets', market);
+      market.placeAtBidWall = "10000";
+      market.placeAtSellWall = "10000";
+      await api.db.update("markets", market);
     }
 
-    mktsToCheck = await api.db.find(
-      'markets',
-      {
-        placeAtBidWall: {
-          $exists: false,
-        },
+    mktsToCheck = await api.db.find("markets", {
+      placeAtBidWall: {
+        $exists: false,
       },
-    );
+    });
 
     nbMkts = mktsToCheck.length;
   }
 };
 
 // check that token transfers succeeded
-const isTokenTransferVerified = (result, from, to, symbol, quantity, eventStr) => {
-  if (result.errors === undefined
-    && result.events && result.events.find(el => el.contract === 'tokens' && el.event === eventStr
-      && el.data.from === from && el.data.to === to && el.data.quantity === quantity && el.data.symbol === symbol) !== undefined) {
+const isTokenTransferVerified = (
+  result,
+  from,
+  to,
+  symbol,
+  quantity,
+  eventStr
+) => {
+  if (
+    result.errors === undefined &&
+    result.events &&
+    result.events.find(
+      (el) =>
+        el.contract === "tokens" &&
+        el.event === eventStr &&
+        el.data.from === from &&
+        el.data.to === to &&
+        el.data.quantity === quantity &&
+        el.data.symbol === symbol
+    ) !== undefined
+  ) {
     return true;
   }
   return false;
 };
 
-const countDecimals = value => api.BigNumber(value).dp();
+const countDecimals = (value) => api.BigNumber(value).dp();
 
 const verifyUtilityTokenStake = async (amount, account) => {
   if (api.BigNumber(amount).lte(0)) {
     return true;
   }
-  const utilityTokenStake = await api.db.findOneInTable('tokens', 'balances', { account, symbol: UTILITY_TOKEN_SYMBOL });
+  const utilityTokenStake = await api.db.findOneInTable("tokens", "balances", {
+    account,
+    symbol: UTILITY_TOKEN_SYMBOL,
+  });
   if (utilityTokenStake && api.BigNumber(utilityTokenStake.stake).gte(amount)) {
     return true;
   }
@@ -173,8 +237,15 @@ const verifyUtilityTokenBalance = async (amount, account) => {
   if (api.BigNumber(amount).lte(0)) {
     return true;
   }
-  const utilityTokenBalance = await api.db.findOneInTable('tokens', 'balances', { account, symbol: UTILITY_TOKEN_SYMBOL });
-  if (utilityTokenBalance && api.BigNumber(utilityTokenBalance.balance).gte(amount)) {
+  const utilityTokenBalance = await api.db.findOneInTable(
+    "tokens",
+    "balances",
+    { account, symbol: UTILITY_TOKEN_SYMBOL }
+  );
+  if (
+    utilityTokenBalance &&
+    api.BigNumber(utilityTokenBalance.balance).gte(amount)
+  ) {
     return true;
   }
   return false;
@@ -182,11 +253,23 @@ const verifyUtilityTokenBalance = async (amount, account) => {
 
 const burnFee = async (amount, isSignedWithActiveKey) => {
   if (api.BigNumber(amount).gt(0)) {
-    const res = await api.executeSmartContract('tokens', 'transfer', {
-      to: 'null', symbol: UTILITY_TOKEN_SYMBOL, quantity: amount, isSignedWithActiveKey,
+    const res = await api.executeSmartContract("tokens", "transfer", {
+      to: "null",
+      symbol: UTILITY_TOKEN_SYMBOL,
+      quantity: amount,
+      isSignedWithActiveKey,
     });
     // check if the tokens were sent
-    if (!isTokenTransferVerified(res, api.sender, 'null', UTILITY_TOKEN_SYMBOL, amount, 'transfer')) {
+    if (
+      !isTokenTransferVerified(
+        res,
+        api.sender,
+        "null",
+        UTILITY_TOKEN_SYMBOL,
+        amount,
+        "transfer"
+      )
+    ) {
       return false;
     }
   }
@@ -196,25 +279,25 @@ const burnFee = async (amount, isSignedWithActiveKey) => {
 // ----- END UTILITY FUNCTIONS -----
 
 actions.createSSC = async () => {
-  const tableExists = await api.db.tableExists('users');
+  const tableExists = await api.db.tableExists("users");
   if (tableExists === false) {
-    await api.db.createTable('users', ['account', 'lastTickBlock']);
-    await api.db.createTable('markets', ['account', 'symbol']);
-    await api.db.createTable('params');
+    await api.db.createTable("users", ["account", "lastTickBlock"]);
+    await api.db.createTable("markets", ["account", "symbol"]);
+    await api.db.createTable("params");
 
     const params = {};
-    params.basicFee = '100';
-    params.basicSettingsFee = '1';
-    params.premiumFee = '100';
-    params.premiumBaseStake = '1000';
-    params.stakePerMarket = '200';
+    params.basicFee = "100";
+    params.basicSettingsFee = "1";
+    params.premiumFee = "100";
+    params.premiumBaseStake = "1000";
+    params.stakePerMarket = "200";
     params.basicDurationBlocks = 403200; // 14 days
     params.basicCooldownBlocks = 403200; // 14 days
     params.basicMinTickIntervalBlocks = 200; // 10 minutes
     params.premiumMinTickIntervalBlocks = 100; // 5 minutes
     params.basicMaxTicksPerBlock = 20;
     params.premiumMaxTicksPerBlock = 30;
-    await api.db.insert('params', params);
+    await api.db.insert("params", params);
   } else {
     await upgradeUserSchema();
     await upgradeMarketSchema();
@@ -238,8 +321,13 @@ const tickUsers = async (params, users, currentTimestamp, txIdPrefix) => {
       }
     } else {
       // demote account if no longer eligible for premium
-      userBalance = await api.db.findOneInTable('tokens', 'balances', { account: user.account, symbol: UTILITY_TOKEN_SYMBOL });
-      const hasEnoughStake = userBalance && api.BigNumber(userBalance.stake).gte(params.premiumBaseStake);
+      userBalance = await api.db.findOneInTable("tokens", "balances", {
+        account: user.account,
+        symbol: UTILITY_TOKEN_SYMBOL,
+      });
+      const hasEnoughStake =
+        userBalance &&
+        api.BigNumber(userBalance.stake).gte(params.premiumBaseStake);
       if (!hasEnoughStake) {
         user.isPremium = false;
       }
@@ -249,31 +337,40 @@ const tickUsers = async (params, users, currentTimestamp, txIdPrefix) => {
     user.lastTickTimestamp = currentTimestamp;
 
     if (!user.isEnabled || user.enabledMarkets < 1) {
-      await api.db.update('users', user);
+      await api.db.update("users", user);
       continue;
     }
 
     // if user was premium but got demoted, they may have too many markets
-    const authorizedAction = (user.isPremium || (user.markets === 1));
+    const authorizedAction = user.isPremium || user.markets === 1;
     let hasEnoughStakeForMarkets = false;
     if (authorizedAction) {
       // ensure user has enough staked for all markets
       if (!userBalance) {
-        userBalance = await api.db.findOneInTable('tokens', 'balances', { account: user.account, symbol: UTILITY_TOKEN_SYMBOL });
+        userBalance = await api.db.findOneInTable("tokens", "balances", {
+          account: user.account,
+          symbol: UTILITY_TOKEN_SYMBOL,
+        });
       }
-      let requiredStake = api.BigNumber(params.stakePerMarket).multipliedBy(user.markets);
+      let requiredStake = api
+        .BigNumber(params.stakePerMarket)
+        .multipliedBy(user.markets);
       if (user.isPremium) {
         requiredStake = requiredStake.plus(params.premiumBaseStake);
       }
-      hasEnoughStakeForMarkets = userBalance && api.BigNumber(userBalance.stake).gte(requiredStake);
+      hasEnoughStakeForMarkets =
+        userBalance && api.BigNumber(userBalance.stake).gte(requiredStake);
     }
 
     const markets = await api.db.find(
-      'markets',
+      "markets",
       { account: user.account, isEnabled: true },
       user.markets,
       0,
-      [{ index: 'symbol', descending: false }, { index: '_id', descending: false }],
+      [
+        { index: "symbol", descending: false },
+        { index: "_id", descending: false },
+      ]
     );
 
     if (!authorizedAction || !hasEnoughStakeForMarkets) {
@@ -284,14 +381,14 @@ const tickUsers = async (params, users, currentTimestamp, txIdPrefix) => {
         if (!user.isPremium) {
           market.strategy = 1;
         }
-        await api.db.update('markets', market);
+        await api.db.update("markets", market);
       }
       user.enabledMarkets = 0;
-      await api.db.update('users', user);
+      await api.db.update("users", user);
       continue;
     }
 
-    await api.db.update('users', user);
+    await api.db.update("users", user);
 
     markets.forEach((m) => {
       // only premium accounts can use other order strategies
@@ -304,21 +401,26 @@ const tickUsers = async (params, users, currentTimestamp, txIdPrefix) => {
   }
 
   if (marketList.length > 0) {
-    await api.executeSmartContract('marketmaker', 'tick', { markets: marketList, txIdBase: `${txIdPrefix}-${api.blockNumber}-${api.transactionId}` });
+    await api.executeSmartContract("marketmaker", "tick", {
+      markets: marketList,
+      txIdBase: `${txIdPrefix}-${api.blockNumber}-${api.transactionId}`,
+    });
   }
 };
 
 actions.tick = async () => {
-  if (api.assert(api.sender === 'null', 'not authorized')) {
+  if (api.assert(api.sender === "null", "not authorized")) {
     // get contract params
-    const params = await api.db.findOne('params', {});
+    const params = await api.db.findOne("params", {});
     const currentTimestamp = getCurrentTimestamp();
-    const cutoffBasic = currentTimestamp - (params.basicMinTickIntervalBlocks * 3 * 1000);
-    const cutoffPremium = currentTimestamp - (params.premiumMinTickIntervalBlocks * 3 * 1000);
+    const cutoffBasic =
+      currentTimestamp - params.basicMinTickIntervalBlocks * 3 * 1000;
+    const cutoffPremium =
+      currentTimestamp - params.premiumMinTickIntervalBlocks * 3 * 1000;
 
     // get some basic accounts that are ready to be ticked
     const pendingBasicTicks = await api.db.find(
-      'users',
+      "users",
       {
         isEnabled: true,
         isPremium: false,
@@ -328,13 +430,16 @@ actions.tick = async () => {
       },
       params.basicMaxTicksPerBlock,
       0,
-      [{ index: 'lastTickBlock', descending: false }, { index: '_id', descending: false }],
+      [
+        { index: "lastTickBlock", descending: false },
+        { index: "_id", descending: false },
+      ]
     );
-    await tickUsers(params, pendingBasicTicks, currentTimestamp, 'MM-B');
+    await tickUsers(params, pendingBasicTicks, currentTimestamp, "MM-B");
 
     // get some premium accounts that are ready to be ticked
     const pendingPremiumTicks = await api.db.find(
-      'users',
+      "users",
       {
         isEnabled: true,
         isPremium: true,
@@ -344,31 +449,48 @@ actions.tick = async () => {
       },
       params.premiumMaxTicksPerBlock,
       0,
-      [{ index: 'lastTickBlock', descending: false }, { index: '_id', descending: false }],
+      [
+        { index: "lastTickBlock", descending: false },
+        { index: "_id", descending: false },
+      ]
     );
-    await tickUsers(params, pendingPremiumTicks, currentTimestamp, 'MM-P');
+    await tickUsers(params, pendingPremiumTicks, currentTimestamp, "MM-P");
   }
 };
 
 actions.upgrade = async (payload) => {
-  const {
-    isSignedWithActiveKey,
-  } = payload;
+  const { isSignedWithActiveKey } = payload;
 
-  const params = await api.db.findOne('params', {});
-  const hasEnoughStake = await verifyUtilityTokenStake(params.premiumBaseStake, api.sender);
+  const params = await api.db.findOne("params", {});
+  const hasEnoughStake = await verifyUtilityTokenStake(
+    params.premiumBaseStake,
+    api.sender
+  );
 
-  if (api.assert(hasEnoughStake, 'you do not have enough tokens staked')
-    && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')) {
+  if (
+    api.assert(hasEnoughStake, "you do not have enough tokens staked") &&
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    )
+  ) {
     // check if this user exists
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
       // check if this user is already premium
-      if (api.assert(!user.isPremium, 'user is already premium')) {
+      if (api.assert(!user.isPremium, "user is already premium")) {
         if (!user.isPremiumFeePaid) {
           // burn the upgrade fee
-          const authorizedUpgrade = await verifyUtilityTokenBalance(params.premiumFee, api.sender);
-          if (!api.assert(authorizedUpgrade, 'you must have enough tokens to cover the premium upgrade fee')) {
+          const authorizedUpgrade = await verifyUtilityTokenBalance(
+            params.premiumFee,
+            api.sender
+          );
+          if (
+            !api.assert(
+              authorizedUpgrade,
+              "you must have enough tokens to cover the premium upgrade fee"
+            )
+          ) {
             return false;
           }
           if (!(await burnFee(params.premiumFee, isSignedWithActiveKey))) {
@@ -385,9 +507,9 @@ actions.upgrade = async (payload) => {
         user.lastTickBlock = api.blockNumber;
         user.lastTickTimestamp = getCurrentTimestamp();
 
-        await api.db.update('users', user);
+        await api.db.update("users", user);
 
-        api.emit('upgrade', {
+        api.emit("upgrade", {
           account: api.sender,
         });
         return true;
@@ -398,15 +520,18 @@ actions.upgrade = async (payload) => {
 };
 
 actions.turnOff = async (payload) => {
-  const {
-    isSignedWithActiveKey,
-  } = payload;
+  const { isSignedWithActiveKey } = payload;
 
-  if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')) {
+  if (
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
-      if (api.assert(user.isEnabled, 'account already turned off')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
+      if (api.assert(user.isEnabled, "account already turned off")) {
         const currentTimestamp = getCurrentTimestamp();
         // update duration and see if we need to go into cooldown
         if (!user.isPremium) {
@@ -422,10 +547,10 @@ actions.turnOff = async (payload) => {
         user.lastTickBlock = api.blockNumber;
         user.lastTickTimestamp = currentTimestamp;
 
-        await api.db.update('users', user);
+        await api.db.update("users", user);
 
         // TODO: in future, maybe pull any orders the bot has placed for this user?
-        api.emit('turnOff', {
+        api.emit("turnOff", {
           account: api.sender,
         });
       }
@@ -434,20 +559,31 @@ actions.turnOff = async (payload) => {
 };
 
 actions.turnOn = async (payload) => {
-  const {
-    isSignedWithActiveKey,
-  } = payload;
+  const { isSignedWithActiveKey } = payload;
 
-  const params = await api.db.findOne('params', {});
+  const params = await api.db.findOne("params", {});
 
-  if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')) {
+  if (
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
       const currentTimestamp = getCurrentTimestamp();
       const tickInterval = currentTimestamp - user.lastTickTimestamp;
-      if (api.assert(!user.isEnabled, 'account already turned on')
-        && api.assert(user.isPremium || !user.isOnCooldown || (user.isOnCooldown && tickInterval >= (params.basicCooldownBlocks * 3 * 1000)), 'cooldown duration not expired')) {
+      if (
+        api.assert(!user.isEnabled, "account already turned on") &&
+        api.assert(
+          user.isPremium ||
+            !user.isOnCooldown ||
+            (user.isOnCooldown &&
+              tickInterval >= params.basicCooldownBlocks * 3 * 1000),
+          "cooldown duration not expired"
+        )
+      ) {
         user.isEnabled = true;
         if (user.isOnCooldown) {
           user.timeLimit = params.basicDurationBlocks * 3 * 1000;
@@ -456,9 +592,9 @@ actions.turnOn = async (payload) => {
         user.lastTickBlock = api.blockNumber;
         user.lastTickTimestamp = currentTimestamp;
 
-        await api.db.update('users', user);
+        await api.db.update("users", user);
 
-        api.emit('turnOn', {
+        api.emit("turnOn", {
           account: api.sender,
         });
       }
@@ -467,26 +603,34 @@ actions.turnOn = async (payload) => {
 };
 
 actions.disableMarket = async (payload) => {
-  const {
-    symbol,
-    isSignedWithActiveKey,
-  } = payload;
+  const { symbol, isSignedWithActiveKey } = payload;
 
-  if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    && api.assert(symbol && typeof symbol === 'string' && symbol !== BASE_SYMBOL, 'invalid params')) {
+  if (
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    ) &&
+    api.assert(
+      symbol && typeof symbol === "string" && symbol !== BASE_SYMBOL,
+      "invalid params"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
-      const market = await api.db.findOne('markets', { account: api.sender, symbol });
-      if (api.assert(market !== null, 'market must exist')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
+      const market = await api.db.findOne("markets", {
+        account: api.sender,
+        symbol,
+      });
+      if (api.assert(market !== null, "market must exist")) {
         if (market.isEnabled) {
           market.isEnabled = false;
-          await api.db.update('markets', market);
+          await api.db.update("markets", market);
 
           user.enabledMarkets -= 1;
-          await api.db.update('users', user);
+          await api.db.update("users", user);
 
-          api.emit('disableMarket', {
+          api.emit("disableMarket", {
             account: api.sender,
             symbol,
           });
@@ -497,41 +641,64 @@ actions.disableMarket = async (payload) => {
 };
 
 actions.enableMarket = async (payload) => {
-  const {
-    symbol,
-    isSignedWithActiveKey,
-  } = payload;
+  const { symbol, isSignedWithActiveKey } = payload;
 
-  if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    && api.assert(symbol && typeof symbol === 'string' && symbol !== BASE_SYMBOL, 'invalid params')) {
+  if (
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    ) &&
+    api.assert(
+      symbol && typeof symbol === "string" && symbol !== BASE_SYMBOL,
+      "invalid params"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
-      const market = await api.db.findOne('markets', { account: api.sender, symbol });
-      if (api.assert(market !== null, 'market must exist')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
+      const market = await api.db.findOne("markets", {
+        account: api.sender,
+        symbol,
+      });
+      if (api.assert(market !== null, "market must exist")) {
         if (!market.isEnabled) {
           // if user was premium but got demoted, they may have too many markets
-          const authorizedAction = (user.isPremium || (user.markets === 1));
-          if (api.assert(authorizedAction, 'user has too many markets; premium upgrade required')) {
+          const authorizedAction = user.isPremium || user.markets === 1;
+          if (
+            api.assert(
+              authorizedAction,
+              "user has too many markets; premium upgrade required"
+            )
+          ) {
             // ensure user has enough tokens staked
-            const params = await api.db.findOne('params', {});
-            let requiredStake = api.BigNumber(params.stakePerMarket).multipliedBy(user.markets);
+            const params = await api.db.findOne("params", {});
+            let requiredStake = api
+              .BigNumber(params.stakePerMarket)
+              .multipliedBy(user.markets);
             if (user.isPremium) {
               requiredStake = requiredStake.plus(params.premiumBaseStake);
             }
-            const hasEnoughStake = await verifyUtilityTokenStake(requiredStake, api.sender);
-            if (api.assert(hasEnoughStake, `must stake more ${UTILITY_TOKEN_SYMBOL} to enable market`)) {
+            const hasEnoughStake = await verifyUtilityTokenStake(
+              requiredStake,
+              api.sender
+            );
+            if (
+              api.assert(
+                hasEnoughStake,
+                `must stake more ${UTILITY_TOKEN_SYMBOL} to enable market`
+              )
+            ) {
               market.isEnabled = true;
               // only premium accounts can use other order strategies
               if (!user.isPremium) {
                 market.strategy = 1;
               }
-              await api.db.update('markets', market);
+              await api.db.update("markets", market);
 
               user.enabledMarkets += 1;
-              await api.db.update('users', user);
+              await api.db.update("users", user);
 
-              api.emit('enableMarket', {
+              api.emit("enableMarket", {
                 account: api.sender,
                 symbol,
               });
@@ -544,28 +711,36 @@ actions.enableMarket = async (payload) => {
 };
 
 actions.removeMarket = async (payload) => {
-  const {
-    symbol,
-    isSignedWithActiveKey,
-  } = payload;
+  const { symbol, isSignedWithActiveKey } = payload;
 
-  if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    && api.assert(symbol && typeof symbol === 'string' && symbol !== BASE_SYMBOL, 'invalid params')) {
+  if (
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    ) &&
+    api.assert(
+      symbol && typeof symbol === "string" && symbol !== BASE_SYMBOL,
+      "invalid params"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
-      const market = await api.db.findOne('markets', { account: api.sender, symbol });
-      if (api.assert(market !== null, 'market must exist')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
+      const market = await api.db.findOne("markets", {
+        account: api.sender,
+        symbol,
+      });
+      if (api.assert(market !== null, "market must exist")) {
         // decrease user's market count
         user.markets -= 1;
         if (market.isEnabled) {
           user.enabledMarkets -= 1;
         }
-        await api.db.update('users', user);
+        await api.db.update("users", user);
 
-        await api.db.remove('markets', market);
+        await api.db.remove("markets", market);
 
-        api.emit('removeMarket', {
+        api.emit("removeMarket", {
           account: api.sender,
           symbol,
         });
@@ -593,22 +768,134 @@ const updateMarketInternal = async (payload, market, shouldPayFee, params) => {
   } = payload;
 
   // nothing to do if there's not at least one field to update
-  if (strategy === undefined && maxBidPrice === undefined && minSellPrice === undefined && maxBaseToSpend === undefined && minBaseToSpend === undefined && maxTokensToSell === undefined && minTokensToSell === undefined && priceIncrement === undefined && minSpread === undefined && maxDistFromNext === undefined && ignoreOrderQtyLt === undefined && placeAtBidWall === undefined && placeAtSellWall === undefined) {
+  if (
+    strategy === undefined &&
+    maxBidPrice === undefined &&
+    minSellPrice === undefined &&
+    maxBaseToSpend === undefined &&
+    minBaseToSpend === undefined &&
+    maxTokensToSell === undefined &&
+    minTokensToSell === undefined &&
+    priceIncrement === undefined &&
+    minSpread === undefined &&
+    maxDistFromNext === undefined &&
+    ignoreOrderQtyLt === undefined &&
+    placeAtBidWall === undefined &&
+    placeAtSellWall === undefined
+  ) {
     return false;
   }
 
-  if (api.assert(maxBidPrice === undefined || (maxBidPrice && typeof maxBidPrice === 'string' && !api.BigNumber(maxBidPrice).isNaN() && api.BigNumber(maxBidPrice).gt(0) && countDecimals(maxBidPrice) <= BASE_SYMBOL_PRECISION), 'invalid maxBidPrice')
-    && api.assert(minSellPrice === undefined || (minSellPrice && typeof minSellPrice === 'string' && !api.BigNumber(minSellPrice).isNaN() && api.BigNumber(minSellPrice).gt(0) && countDecimals(minSellPrice) <= BASE_SYMBOL_PRECISION), 'invalid minSellPrice')
-    && api.assert(maxBaseToSpend === undefined || (maxBaseToSpend && typeof maxBaseToSpend === 'string' && !api.BigNumber(maxBaseToSpend).isNaN() && api.BigNumber(maxBaseToSpend).gt(0) && countDecimals(maxBaseToSpend) <= BASE_SYMBOL_PRECISION), 'invalid maxBaseToSpend')
-    && api.assert(minBaseToSpend === undefined || (minBaseToSpend && typeof minBaseToSpend === 'string' && !api.BigNumber(minBaseToSpend).isNaN() && api.BigNumber(minBaseToSpend).gt(0) && countDecimals(minBaseToSpend) <= BASE_SYMBOL_PRECISION), 'invalid minBaseToSpend')
-    && api.assert(maxTokensToSell === undefined || (maxTokensToSell && typeof maxTokensToSell === 'string' && !api.BigNumber(maxTokensToSell).isNaN() && api.BigNumber(maxTokensToSell).gt(0) && countDecimals(maxTokensToSell) <= market.precision), 'invalid maxTokensToSell')
-    && api.assert(minTokensToSell === undefined || (minTokensToSell && typeof minTokensToSell === 'string' && !api.BigNumber(minTokensToSell).isNaN() && api.BigNumber(minTokensToSell).gt(0) && countDecimals(minTokensToSell) <= market.precision), 'invalid minTokensToSell')
-    && api.assert(priceIncrement === undefined || (priceIncrement && typeof priceIncrement === 'string' && !api.BigNumber(priceIncrement).isNaN() && api.BigNumber(priceIncrement).gt(0) && countDecimals(priceIncrement) <= BASE_SYMBOL_PRECISION), 'invalid priceIncrement')
-    && api.assert(minSpread === undefined || (minSpread && typeof minSpread === 'string' && !api.BigNumber(minSpread).isNaN() && api.BigNumber(minSpread).gt(0) && countDecimals(minSpread) <= BASE_SYMBOL_PRECISION), 'invalid minSpread')
-    && api.assert(maxDistFromNext === undefined || (maxDistFromNext && typeof maxDistFromNext === 'string' && !api.BigNumber(maxDistFromNext).isNaN() && api.BigNumber(maxDistFromNext).gt(0) && countDecimals(maxDistFromNext) <= BASE_SYMBOL_PRECISION), 'invalid maxDistFromNext')
-    && api.assert(ignoreOrderQtyLt === undefined || (ignoreOrderQtyLt && typeof ignoreOrderQtyLt === 'string' && !api.BigNumber(ignoreOrderQtyLt).isNaN() && api.BigNumber(ignoreOrderQtyLt).gt(0) && countDecimals(ignoreOrderQtyLt) <= market.precision), 'invalid ignoreOrderQtyLt')
-    && api.assert(placeAtBidWall === undefined || (placeAtBidWall && typeof placeAtBidWall === 'string' && !api.BigNumber(placeAtBidWall).isNaN() && api.BigNumber(placeAtBidWall).gt(0) && countDecimals(placeAtBidWall) <= market.precision), 'invalid placeAtBidWall')
-    && api.assert(placeAtSellWall === undefined || (placeAtSellWall && typeof placeAtSellWall === 'string' && !api.BigNumber(placeAtSellWall).isNaN() && api.BigNumber(placeAtSellWall).gt(0) && countDecimals(placeAtSellWall) <= market.precision), 'invalid placeAtSellWall')) {
+  if (
+    api.assert(
+      maxBidPrice === undefined ||
+        (maxBidPrice &&
+          typeof maxBidPrice === "string" &&
+          !api.BigNumber(maxBidPrice).isNaN() &&
+          api.BigNumber(maxBidPrice).gt(0) &&
+          countDecimals(maxBidPrice) <= BASE_SYMBOL_PRECISION),
+      "invalid maxBidPrice"
+    ) &&
+    api.assert(
+      minSellPrice === undefined ||
+        (minSellPrice &&
+          typeof minSellPrice === "string" &&
+          !api.BigNumber(minSellPrice).isNaN() &&
+          api.BigNumber(minSellPrice).gt(0) &&
+          countDecimals(minSellPrice) <= BASE_SYMBOL_PRECISION),
+      "invalid minSellPrice"
+    ) &&
+    api.assert(
+      maxBaseToSpend === undefined ||
+        (maxBaseToSpend &&
+          typeof maxBaseToSpend === "string" &&
+          !api.BigNumber(maxBaseToSpend).isNaN() &&
+          api.BigNumber(maxBaseToSpend).gt(0) &&
+          countDecimals(maxBaseToSpend) <= BASE_SYMBOL_PRECISION),
+      "invalid maxBaseToSpend"
+    ) &&
+    api.assert(
+      minBaseToSpend === undefined ||
+        (minBaseToSpend &&
+          typeof minBaseToSpend === "string" &&
+          !api.BigNumber(minBaseToSpend).isNaN() &&
+          api.BigNumber(minBaseToSpend).gt(0) &&
+          countDecimals(minBaseToSpend) <= BASE_SYMBOL_PRECISION),
+      "invalid minBaseToSpend"
+    ) &&
+    api.assert(
+      maxTokensToSell === undefined ||
+        (maxTokensToSell &&
+          typeof maxTokensToSell === "string" &&
+          !api.BigNumber(maxTokensToSell).isNaN() &&
+          api.BigNumber(maxTokensToSell).gt(0) &&
+          countDecimals(maxTokensToSell) <= market.precision),
+      "invalid maxTokensToSell"
+    ) &&
+    api.assert(
+      minTokensToSell === undefined ||
+        (minTokensToSell &&
+          typeof minTokensToSell === "string" &&
+          !api.BigNumber(minTokensToSell).isNaN() &&
+          api.BigNumber(minTokensToSell).gt(0) &&
+          countDecimals(minTokensToSell) <= market.precision),
+      "invalid minTokensToSell"
+    ) &&
+    api.assert(
+      priceIncrement === undefined ||
+        (priceIncrement &&
+          typeof priceIncrement === "string" &&
+          !api.BigNumber(priceIncrement).isNaN() &&
+          api.BigNumber(priceIncrement).gt(0) &&
+          countDecimals(priceIncrement) <= BASE_SYMBOL_PRECISION),
+      "invalid priceIncrement"
+    ) &&
+    api.assert(
+      minSpread === undefined ||
+        (minSpread &&
+          typeof minSpread === "string" &&
+          !api.BigNumber(minSpread).isNaN() &&
+          api.BigNumber(minSpread).gt(0) &&
+          countDecimals(minSpread) <= BASE_SYMBOL_PRECISION),
+      "invalid minSpread"
+    ) &&
+    api.assert(
+      maxDistFromNext === undefined ||
+        (maxDistFromNext &&
+          typeof maxDistFromNext === "string" &&
+          !api.BigNumber(maxDistFromNext).isNaN() &&
+          api.BigNumber(maxDistFromNext).gt(0) &&
+          countDecimals(maxDistFromNext) <= BASE_SYMBOL_PRECISION),
+      "invalid maxDistFromNext"
+    ) &&
+    api.assert(
+      ignoreOrderQtyLt === undefined ||
+        (ignoreOrderQtyLt &&
+          typeof ignoreOrderQtyLt === "string" &&
+          !api.BigNumber(ignoreOrderQtyLt).isNaN() &&
+          api.BigNumber(ignoreOrderQtyLt).gt(0) &&
+          countDecimals(ignoreOrderQtyLt) <= market.precision),
+      "invalid ignoreOrderQtyLt"
+    ) &&
+    api.assert(
+      placeAtBidWall === undefined ||
+        (placeAtBidWall &&
+          typeof placeAtBidWall === "string" &&
+          !api.BigNumber(placeAtBidWall).isNaN() &&
+          api.BigNumber(placeAtBidWall).gt(0) &&
+          countDecimals(placeAtBidWall) <= market.precision),
+      "invalid placeAtBidWall"
+    ) &&
+    api.assert(
+      placeAtSellWall === undefined ||
+        (placeAtSellWall &&
+          typeof placeAtSellWall === "string" &&
+          !api.BigNumber(placeAtSellWall).isNaN() &&
+          api.BigNumber(placeAtSellWall).gt(0) &&
+          countDecimals(placeAtSellWall) <= market.precision),
+      "invalid placeAtSellWall"
+    )
+  ) {
     if (shouldPayFee) {
       // burn the settings change fee
       if (!(await burnFee(params.basicSettingsFee, true))) {
@@ -688,9 +975,9 @@ const updateMarketInternal = async (payload, market, shouldPayFee, params) => {
       update.newPlaceAtSellWall = placeAtSellWall;
     }
 
-    await api.db.update('markets', market);
+    await api.db.update("markets", market);
 
-    api.emit('updateMarket', update);
+    api.emit("updateMarket", update);
 
     return true;
   }
@@ -699,31 +986,60 @@ const updateMarketInternal = async (payload, market, shouldPayFee, params) => {
 /* eslint-enable no-param-reassign */
 
 actions.updateMarket = async (payload) => {
-  const {
-    symbol,
-    strategy,
-    isSignedWithActiveKey,
-  } = payload;
+  const { symbol, strategy, isSignedWithActiveKey } = payload;
   const stratTypes = [1, 2, 3];
 
-  if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    && api.assert(symbol && typeof symbol === 'string' && symbol !== BASE_SYMBOL, 'invalid params')) {
+  if (
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    ) &&
+    api.assert(
+      symbol && typeof symbol === "string" && symbol !== BASE_SYMBOL,
+      "invalid params"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
-      if (api.assert(strategy === undefined || (typeof strategy === 'number' && Number.isInteger(strategy) && stratTypes.includes(strategy) && user.isPremium), 'invalid params or user not premium')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
+      if (
+        api.assert(
+          strategy === undefined ||
+            (typeof strategy === "number" &&
+              Number.isInteger(strategy) &&
+              stratTypes.includes(strategy) &&
+              user.isPremium),
+          "invalid params or user not premium"
+        )
+      ) {
         // if user is not premium, a settings change fee must be paid
-        const params = await api.db.findOne('params', {});
+        const params = await api.db.findOne("params", {});
         let authorizedAction = false;
         if (user.isPremium) {
           authorizedAction = true;
         } else {
-          authorizedAction = await verifyUtilityTokenBalance(params.basicSettingsFee, api.sender);
+          authorizedAction = await verifyUtilityTokenBalance(
+            params.basicSettingsFee,
+            api.sender
+          );
         }
-        if (api.assert(authorizedAction, 'you must have enough tokens to cover the settings change fee')) {
-          const market = await api.db.findOne('markets', { account: api.sender, symbol });
-          if (api.assert(market !== null, 'market must exist')) {
-            const resultCode = await updateMarketInternal(payload, market, !user.isPremium, params);
+        if (
+          api.assert(
+            authorizedAction,
+            "you must have enough tokens to cover the settings change fee"
+          )
+        ) {
+          const market = await api.db.findOne("markets", {
+            account: api.sender,
+            symbol,
+          });
+          if (api.assert(market !== null, "market must exist")) {
+            const resultCode = await updateMarketInternal(
+              payload,
+              market,
+              !user.isPremium,
+              params
+            );
             return resultCode;
           }
         }
@@ -734,59 +1050,92 @@ actions.updateMarket = async (payload) => {
 };
 
 actions.addMarket = async (payload) => {
-  const {
-    symbol,
-    strategy,
-    isSignedWithActiveKey,
-  } = payload;
+  const { symbol, strategy, isSignedWithActiveKey } = payload;
   const stratTypes = [1, 2, 3];
 
-  if (api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')
-    && api.assert(symbol && typeof symbol === 'string' && symbol !== BASE_SYMBOL, 'invalid params')) {
+  if (
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    ) &&
+    api.assert(
+      symbol && typeof symbol === "string" && symbol !== BASE_SYMBOL,
+      "invalid params"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user !== null, 'user not registered')) {
-      if (api.assert(strategy === undefined || (typeof strategy === 'number' && Number.isInteger(strategy) && stratTypes.includes(strategy) && user.isPremium), 'invalid params or user not premium')) {
-        const token = await api.db.findOneInTable('tokens', 'tokens', { symbol });
-        if (api.assert(token !== null, 'symbol must exist')) {
-          const market = await api.db.findOne('markets', { account: api.sender, symbol });
-          if (api.assert(market === null, 'market already added')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user !== null, "user not registered")) {
+      if (
+        api.assert(
+          strategy === undefined ||
+            (typeof strategy === "number" &&
+              Number.isInteger(strategy) &&
+              stratTypes.includes(strategy) &&
+              user.isPremium),
+          "invalid params or user not premium"
+        )
+      ) {
+        const token = await api.db.findOneInTable("tokens", "tokens", {
+          symbol,
+        });
+        if (api.assert(token !== null, "symbol must exist")) {
+          const market = await api.db.findOne("markets", {
+            account: api.sender,
+            symbol,
+          });
+          if (api.assert(market === null, "market already added")) {
             // check to see if user is able to add another market
-            const authorizedAddition = (user.isPremium || (user.markets === 0));
-            if (api.assert(authorizedAddition, 'not allowed to add another market')) {
+            const authorizedAddition = user.isPremium || user.markets === 0;
+            if (
+              api.assert(
+                authorizedAddition,
+                "not allowed to add another market"
+              )
+            ) {
               // finally, user must have enough tokens staked
-              const params = await api.db.findOne('params', {});
-              let requiredStake = api.BigNumber(params.stakePerMarket).multipliedBy(user.markets + 1);
+              const params = await api.db.findOne("params", {});
+              let requiredStake = api
+                .BigNumber(params.stakePerMarket)
+                .multipliedBy(user.markets + 1);
               if (user.isPremium) {
                 requiredStake = requiredStake.plus(params.premiumBaseStake);
               }
-              const hasEnoughStake = await verifyUtilityTokenStake(requiredStake, api.sender);
-              if (api.assert(hasEnoughStake, `must stake more ${UTILITY_TOKEN_SYMBOL} to add a market`)) {
+              const hasEnoughStake = await verifyUtilityTokenStake(
+                requiredStake,
+                api.sender
+              );
+              if (
+                api.assert(
+                  hasEnoughStake,
+                  `must stake more ${UTILITY_TOKEN_SYMBOL} to add a market`
+                )
+              ) {
                 const newMarket = {
                   account: api.sender,
                   symbol,
                   precision: token.precision,
                   strategy: 1,
-                  maxBidPrice: '1000',
-                  minSellPrice: '0.00000001',
-                  maxBaseToSpend: '100',
-                  minBaseToSpend: '1',
-                  maxTokensToSell: '100',
-                  minTokensToSell: '1',
-                  priceIncrement: '0.00001',
-                  minSpread: '0.00000001',
-                  maxDistFromNext: '0.0001',
-                  ignoreOrderQtyLt: '50',
-                  placeAtBidWall: '10000',
-                  placeAtSellWall: '10000',
+                  maxBidPrice: "1000",
+                  minSellPrice: "0.00000001",
+                  maxBaseToSpend: "100",
+                  minBaseToSpend: "1",
+                  maxTokensToSell: "100",
+                  minTokensToSell: "1",
+                  priceIncrement: "0.00001",
+                  minSpread: "0.00000001",
+                  maxDistFromNext: "0.0001",
+                  ignoreOrderQtyLt: "50",
+                  placeAtBidWall: "10000",
+                  placeAtSellWall: "10000",
                   isEnabled: true,
                   creationTimestamp: getCurrentTimestamp(),
                   creationBlock: api.blockNumber,
                 };
 
-                const addedMarket = await api.db.insert('markets', newMarket);
+                const addedMarket = await api.db.insert("markets", newMarket);
 
-                api.emit('addMarket', {
+                api.emit("addMarket", {
                   account: api.sender,
                   symbol,
                 });
@@ -794,7 +1143,7 @@ actions.addMarket = async (payload) => {
                 // increase user's market count
                 user.markets += 1;
                 user.enabledMarkets += 1;
-                await api.db.update('users', user);
+                await api.db.update("users", user);
 
                 // do initial settings update
                 await updateMarketInternal(payload, addedMarket, false, params);
@@ -808,18 +1157,27 @@ actions.addMarket = async (payload) => {
 };
 
 actions.register = async (payload) => {
-  const {
-    isSignedWithActiveKey,
-  } = payload;
+  const { isSignedWithActiveKey } = payload;
 
-  const params = await api.db.findOne('params', {});
-  const authorizedRegistration = await verifyUtilityTokenBalance(params.basicFee, api.sender);
+  const params = await api.db.findOne("params", {});
+  const authorizedRegistration = await verifyUtilityTokenBalance(
+    params.basicFee,
+    api.sender
+  );
 
-  if (api.assert(authorizedRegistration, 'you must have enough tokens to cover the registration fee')
-    && api.assert(isSignedWithActiveKey === true, 'you must use a custom_json signed with your active key')) {
+  if (
+    api.assert(
+      authorizedRegistration,
+      "you must have enough tokens to cover the registration fee"
+    ) &&
+    api.assert(
+      isSignedWithActiveKey === true,
+      "you must use a custom_json signed with your active key"
+    )
+  ) {
     // check if this user is already registered
-    const user = await api.db.findOne('users', { account: api.sender });
-    if (api.assert(user === null, 'user already registered')) {
+    const user = await api.db.findOne("users", { account: api.sender });
+    if (api.assert(user === null, "user already registered")) {
       // burn the registration fee
       if (!(await burnFee(params.basicFee, isSignedWithActiveKey))) {
         return false;
@@ -842,9 +1200,9 @@ actions.register = async (payload) => {
         creationBlock: api.blockNumber,
       };
 
-      await api.db.insert('users', newUser);
+      await api.db.insert("users", newUser);
 
-      api.emit('register', {
+      api.emit("register", {
         account: api.sender,
       });
       return true;

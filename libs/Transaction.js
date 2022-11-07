@@ -1,17 +1,24 @@
-const SHA256 = require('crypto-js/sha256');
-const enchex = require('crypto-js/enc-hex');
+const SHA256 = require("crypto-js/sha256");
+const enchex = require("crypto-js/enc-hex");
 
 class Transaction {
-  constructor(refHiveBlockNumber, transactionId, sender, contract, action, payload) {
-    this.refHiveBlockNumber = refHiveBlockNumber;
+  constructor(
+    refSteemBlockNumber,
+    transactionId,
+    sender,
+    contract,
+    action,
+    payload
+  ) {
+    this.refSteemBlockNumber = refSteemBlockNumber;
     this.transactionId = transactionId;
     this.sender = sender;
-    this.contract = typeof contract === 'string' ? contract : null;
-    this.action = typeof action === 'string' ? action : null;
-    this.payload = typeof payload === 'string' ? payload : null;
-    this.executedCodeHash = '';
-    this.hash = '';
-    this.databaseHash = '';
+    this.contract = typeof contract === "string" ? contract : null;
+    this.action = typeof action === "string" ? action : null;
+    this.payload = typeof payload === "string" ? payload : null;
+    this.executedCodeHash = "";
+    this.hash = "";
+    this.databaseHash = "";
     this.logs = {};
   }
 
@@ -35,17 +42,16 @@ class Transaction {
   // calculate the hash of the transaction
   calculateHash() {
     this.hash = SHA256(
-      this.refHiveBlockNumber
-      + this.transactionId
-      + this.sender
-      + this.contract
-      + this.action
-      + this.payload
-      + this.executedCodeHash
-      + this.databaseHash
-      + this.logs,
-    )
-      .toString(enchex);
+      this.refSteemBlockNumber +
+        this.transactionId +
+        this.sender +
+        this.contract +
+        this.action +
+        this.payload +
+        this.executedCodeHash +
+        this.databaseHash +
+        this.logs
+    ).toString(enchex);
   }
 }
 

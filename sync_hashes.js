@@ -18,43 +18,68 @@
  * 5) resume, and let it catch up, hashes will now be the same.
  */
 
-require('dotenv').config();
-const axios = require('axios');
-const conf = require('./config');
-const { Database } = require('./libs/Database');
-
+require("dotenv").config();
+const axios = require("axios");
+const conf = require("./config");
+const { Database } = require("./libs/Database");
 
 let id = 1;
 
 async function latestBlock() {
   id += 1;
-  return (await axios({
-    url: 'https://api.hive-engine.com/rpc/blockchain',
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
-    data: { jsonrpc: '2.0', id, method: 'getLatestBlockInfo' },
-  })).data.result;
+  return (
+    await axios({
+      url: "https://localhost/rpc/blockchain",
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      data: { jsonrpc: "2.0", id, method: "getLatestBlockInfo" },
+    })
+  ).data.result;
 }
 
-const contractNames = ['tokens', 'claimdrops', 'distribution', 'nftmarket', 'mining', 'packmanager', 'nft', 'airdrops', 'inflation', 'marketmaker', 'botcontroller', 'market', 'crittermanager', 'hivepegged'];
+const contractNames = [
+  "tokens",
+  "claimdrops",
+  "distribution",
+  "nftmarket",
+  "mining",
+  "packmanager",
+  "nft",
+  "airdrops",
+  "inflation",
+  "marketmaker",
+  "botcontroller",
+  "market",
+  "crittermanager",
+  "steempegged",
+];
 
 async function fetchContractHashes() {
-  const tables = await Promise.all(contractNames.map(contractName => (async () => {
-    id += 1;
-    const contract = (await axios({
-      url: 'https://api.hive-engine.com/rpc/contracts',
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-      },
-      data: {
-        jsonrpc: '2.0', id, method: 'getContract', params: { name: contractName },
-      },
-    })).data.result;
-    return contract.tables;
-  })()));
+  const tables = await Promise.all(
+    contractNames.map((contractName) =>
+      (async () => {
+        id += 1;
+        const contract = (
+          await axios({
+            url: "https://localhost/rpc/contracts",
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            data: {
+              jsonrpc: "2.0",
+              id,
+              method: "getContract",
+              params: { name: contractName },
+            },
+          })
+        ).data.result;
+        return contract.tables;
+      })()
+    )
+  );
   return tables;
 }
 
@@ -65,22 +90,25 @@ async function getHashes() {
   const hashes1 = await fetchContractHashes();
   const hashes2 = await fetchContractHashes();
   const blockAfterFetch = await latestBlock();
-  console.log(`Block before hash fetch: ${block.blockNumber}. Block after: ${blockAfterFetch.blockNumber}`);
+  console.log(
+    `Block before hash fetch: ${block.blockNumber}. Block after: ${blockAfterFetch.blockNumber}`
+  );
 
   console.log(JSON.stringify(hashes1) === JSON.stringify(hashes2));
-  if (block.blockNumber === blockAfterFetch.blockNumber
-      && JSON.stringify(hashes1) === JSON.stringify(hashes2)) {
+  if (
+    block.blockNumber === blockAfterFetch.blockNumber &&
+    JSON.stringify(hashes1) === JSON.stringify(hashes2)
+  ) {
     // hash match, put into database
-    const {
-      databaseURL,
-      databaseName,
-    } = conf;
+    const { databaseURL, databaseName } = conf;
     const database = new Database();
     await database.init(databaseURL, databaseName);
-    const contracts = database.database.collection('contracts');
-    const chain = database.database.collection('chain');
+    const contracts = database.database.collection("contracts");
+    const chain = database.database.collection("chain");
     // eslint-disable-next-line no-underscore-dangle
-    const localBlock = (await chain.find().sort({ _id: -1 }).limit(1).toArray())[0]._id;
+    const localBlock = (
+      await chain.find().sort({ _id: -1 }).limit(1).toArray()
+    )[0]._id;
 
     for (let i = 0; i < contractNames.length; i += 1) {
       const contract = contractNames[i];
@@ -92,7 +120,9 @@ async function getHashes() {
       for (let j = 0; j < tableKeys.length; j += 1) {
         const tableName = tableKeys[j];
         if (contractInDb.tables[tableName].hash !== tables[tableName].hash) {
-          console.log(`Would replace table hash for ${tableName} from ${contractInDb.tables[tableName].hash} to ${tables[tableName].hash}`);
+          console.log(
+            `Would replace table hash for ${tableName} from ${contractInDb.tables[tableName].hash} to ${tables[tableName].hash}`
+          );
           contractInDb.tables[tableName].hash = tables[tableName].hash;
           // uncomment to actually update the hashes of the contracts
           // await contracts.updateOne({ _id: contract }, { $set: contractInDb });
@@ -100,9 +130,13 @@ async function getHashes() {
       }
     }
     // eslint-disable-next-line no-underscore-dangle
-    const localBlockAfterFetch = (await chain.find().sort({ _id: -1 }).limit(1).toArray())[0]._id;
+    const localBlockAfterFetch = (
+      await chain.find().sort({ _id: -1 }).limit(1).toArray()
+    )[0]._id;
 
-    console.log(`Local block before hash fetch: ${localBlock}. Block after: ${localBlockAfterFetch}`);
+    console.log(
+      `Local block before hash fetch: ${localBlock}. Block after: ${localBlockAfterFetch}`
+    );
     database.close();
   }
 }

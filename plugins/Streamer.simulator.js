@@ -1,10 +1,13 @@
-const { Transaction } = require('../libs/Transaction');
-const { IPC } = require('../libs/IPC');
-const BC_PLUGIN_NAME = require('./Blockchain.constants').PLUGIN_NAME;
-const BC_PLUGIN_ACTIONS = require('./Blockchain.constants').PLUGIN_ACTIONS;
+const { Transaction } = require("../libs/Transaction");
+const { IPC } = require("../libs/IPC");
+const BC_PLUGIN_NAME = require("./Blockchain.constants").PLUGIN_NAME;
+const BC_PLUGIN_ACTIONS = require("./Blockchain.constants").PLUGIN_ACTIONS;
 
 const PLUGIN_PATH = require.resolve(__filename);
-const { PLUGIN_NAME, PLUGIN_ACTIONS } = require('./Streamer.simulator.constants');
+const {
+  PLUGIN_NAME,
+  PLUGIN_ACTIONS,
+} = require("./Streamer.simulator.constants");
 
 const ipc = new IPC(PLUGIN_NAME);
 
@@ -22,16 +25,18 @@ function stop() {
 }
 
 function sendBlock(block) {
-  return ipc.send(
-    { to: BC_PLUGIN_NAME, action: BC_PLUGIN_ACTIONS.PRODUCE_NEW_BLOCK_SYNC, payload: block },
-  );
+  return ipc.send({
+    to: BC_PLUGIN_NAME,
+    action: BC_PLUGIN_ACTIONS.PRODUCE_NEW_BLOCK_SYNC,
+    payload: block,
+  });
 }
 
 // get a block from the Hive blockchain
-async function generateBlock(startHiveBlock) {
+async function generateBlock(startSteemBlock) {
   if (stopGeneration) return;
 
-  if (startHiveBlock) blockNumber = startHiveBlock;
+  if (startSteemBlock) blockNumber = startSteemBlock;
 
   blockNumber += 1;
   const block = {
@@ -47,10 +52,10 @@ async function generateBlock(startHiveBlock) {
         blockNumber,
         transactionId,
         `TestSender${transactionId}`,
-        'accounts',
-        'register',
-        '',
-      ),
+        "accounts",
+        "register",
+        ""
+      )
     );
   }
 
@@ -60,11 +65,9 @@ async function generateBlock(startHiveBlock) {
 
 // stream the Hive blockchain to find transactions related to the sidechain
 function init(conf) {
-  const {
-    startHiveBlock,
-  } = conf;
+  const { startSteemBlock } = conf;
 
-  generateBlock(startHiveBlock);
+  generateBlock(startSteemBlock);
 }
 
 ipc.onReceiveMessage((message) => {
@@ -75,15 +78,15 @@ ipc.onReceiveMessage((message) => {
   } = message;
 
   switch (action) {
-    case 'init':
+    case "init":
       init(payload);
       ipc.reply(message);
-      console.log('successfully initialized'); // eslint-disable-line no-console
+      console.log("successfully initialized"); // eslint-disable-line no-console
       break;
-    case 'stop':
+    case "stop":
       ipc.reply(message, stop());
       ipc.reply(message);
-      console.log('successfully stopped'); // eslint-disable-line no-console
+      console.log("successfully stopped"); // eslint-disable-line no-console
       break;
     default:
       ipc.reply(message);

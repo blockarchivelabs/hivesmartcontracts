@@ -4,25 +4,30 @@
 // eslint-disable-next-line no-template-curly-in-string
 const UTILITY_TOKEN_SYMBOL = "'${CONSTANTS.UTILITY_TOKEN_SYMBOL}$'";
 // eslint-disable-next-line no-template-curly-in-string
-const HIVE_ENGINE_ACCOUNT = "'${CONSTANTS.HIVE_ENGINE_ACCOUNT}$'";
+const STEEM_ENGINE_ACCOUNT = "'${CONSTANTS.STEEM_ENGINE_ACCOUNT}$'";
 
-actions.createSSC = async () => {
-
-};
+actions.createSSC = async () => {};
 
 actions.issueNewTokens = async () => {
-  if (api.sender !== 'null') return;
+  if (api.sender !== "null") return;
 
-  // issue tokens to HIVE_ENGINE_ACCOUNT
+  // issue tokens to STEEM_ENGINE_ACCOUNT
   // 100k tokens per year = 11.41552511 tokens per hour (an hour = 1200 blocks)
-  let nbTokens = '11.41552511';
-  await api.executeSmartContract('tokens', 'issue',
-    { symbol: UTILITY_TOKEN_SYMBOL, quantity: nbTokens, to: HIVE_ENGINE_ACCOUNT });
+  let nbTokens = "11.41552511";
+  await api.executeSmartContract("tokens", "issue", {
+    symbol: UTILITY_TOKEN_SYMBOL,
+    quantity: nbTokens,
+    to: STEEM_ENGINE_ACCOUNT,
+  });
 
   // issue tokens to engpool
   // 100k tokens per year = 11.41552511 tokens per hour (an hour = 1200 blocks)
-  nbTokens = '11.41552511';
-  await api.executeSmartContract('tokens', 'issue', { symbol: UTILITY_TOKEN_SYMBOL, quantity: nbTokens, to: 'hive-miner' });
+  nbTokens = "11.41552511";
+  await api.executeSmartContract("tokens", "issue", {
+    symbol: UTILITY_TOKEN_SYMBOL,
+    quantity: nbTokens,
+    to: "hive-miner",
+  });
 
   // issue tokens to "witnesses" contract
   // 200k tokens per year = 22.83105022 tokens per hour (an hour = 1200 blocks)

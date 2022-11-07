@@ -1,11 +1,11 @@
-require('dotenv').config();
-const fs = require('fs-extra');
-const { fork } = require('child_process');
-const blockchain = require('../plugins/Blockchain');
-const jsonRPCServer = require('../plugins/JsonRPCServer');
-const streamer = require('../plugins/Streamer.simulator');
+require("dotenv").config();
+const fs = require("fs-extra");
+const { fork } = require("child_process");
+const blockchain = require("../plugins/Blockchain");
+const jsonRPCServer = require("../plugins/JsonRPCServer");
+const streamer = require("../plugins/Streamer.simulator");
 
-const conf = require('./config');
+const conf = require("./config");
 
 const plugins = {};
 
@@ -17,8 +17,8 @@ function send(plugin, message) {
   const newMessage = {
     ...message,
     to: plugin.name,
-    from: 'MASTER',
-    type: 'request',
+    from: "MASTER",
+    type: "request",
   };
   currentJobId += 1;
   newMessage.jobId = currentJobId;
@@ -36,10 +36,10 @@ const route = (message) => {
   // console.log(message);
   const { to, type, jobId } = message;
   if (to) {
-    if (to === 'MASTER') {
-      if (type && type === 'request') {
+    if (to === "MASTER") {
+      if (type && type === "request") {
         // do something
-      } else if (type && type === 'response' && jobId) {
+      } else if (type && type === "response" && jobId) {
         const job = jobs.get(jobId);
         if (job && job.resolve) {
           const { resolve } = job;
@@ -47,14 +47,14 @@ const route = (message) => {
           resolve(message);
         }
       }
-    } else if (type && type === 'broadcast') {
+    } else if (type && type === "broadcast") {
       plugins.forEach((plugin) => {
         plugin.cp.send(message);
       });
     } else if (plugins[to]) {
       plugins[to].cp.send(message);
     } else {
-      console.error('ROUTING ERROR: ', message); // eslint-disable-line no-console
+      console.error("ROUTING ERROR: ", message); // eslint-disable-line no-console
     }
   }
 };
@@ -71,21 +71,25 @@ const loadPlugin = (newPlugin) => {
   const plugin = {};
   plugin.name = newPlugin.PLUGIN_NAME;
   plugin.cp = fork(newPlugin.PLUGIN_PATH, [], { silent: true, detached: true });
-  plugin.cp.on('message', msg => route(msg));
-  plugin.cp.stdout.on('data', data => console.log(`[${newPlugin.PLUGIN_NAME}]`, data.toString())); // eslint-disable-line no-console
-  plugin.cp.stderr.on('data', data => console.error(`[${newPlugin.PLUGIN_NAME}]`, data.toString())); // eslint-disable-line no-console
+  plugin.cp.on("message", (msg) => route(msg));
+  plugin.cp.stdout.on("data", (data) =>
+    console.log(`[${newPlugin.PLUGIN_NAME}]`, data.toString())
+  ); // eslint-disable-line no-console
+  plugin.cp.stderr.on("data", (data) =>
+    console.error(`[${newPlugin.PLUGIN_NAME}]`, data.toString())
+  ); // eslint-disable-line no-console
 
   plugins[newPlugin.PLUGIN_NAME] = plugin;
 
-  return send(plugin, { action: 'init', payload: conf });
+  return send(plugin, { action: "init", payload: conf });
 };
 
 const unloadPlugin = async (plugin) => {
   let res = null;
   let plg = getPlugin(plugin);
   if (plg) {
-    res = await send(plg, { action: 'stop' });
-    plg.cp.kill('SIGINT');
+    res = await send(plg, { action: "stop" });
+    plg.cp.kill("SIGINT");
     plg = null;
   }
 
@@ -111,9 +115,9 @@ async function stop(callback) {
 }
 
 function saveConfig(lastBlockParsed) {
-  const config = fs.readJSONSync('./config.json');
-  config.startHiveBlock = lastBlockParsed;
-  fs.writeJSONSync('./config.json', config, { spaces: 4 });
+  const config = fs.readJSONSync("./config.json");
+  config.startSteemBlock = lastBlockParsed;
+  fs.writeJSONSync("./config.json", config, { spaces: 4 });
 }
 
 function stopApp(signal = 0) {
@@ -132,14 +136,14 @@ let shuttingDown = false;
 const gracefulShutdown = () => {
   if (shuttingDown === false) {
     shuttingDown = true;
-    stopApp('SIGINT');
+    stopApp("SIGINT");
   }
 };
 
-process.on('SIGTERM', () => {
+process.on("SIGTERM", () => {
   gracefulShutdown();
 });
 
-process.on('SIGINT', () => {
+process.on("SIGINT", () => {
   gracefulShutdown();
 });

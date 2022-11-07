@@ -1,18 +1,18 @@
 {
-    "chainId": "mainnet-hive",
-    "rpcNodePort": 5000,
-    "p2pPort": 5001,
-    "databaseURL": "mongodb://localhost:27017",
-    "databaseName": "hsc",
-    "blocksLogFilePath": "./blocks.log",
-    "javascriptVMTimeout": 10000,
-    "streamNodes": [
-        "https://api.openhive.network",
-        "https://api.hive.blog",
-        "https://anyx.io",
-        "https://api.hivekings.com"
-    ],
-    "startHiveBlock": 38287457,
-    "genesisHiveBlock": 29862600,
-    "witnessEnabled": false
+  "chainId": "mainnet-hive",
+  "rpcNodePort": 5000,
+  "p2pPort": 5001,
+  "databaseURL": "mongodb://localhost:27017",
+  "databaseName": "hsc",
+  "blocksLogFilePath": "./blocks.log",
+  "javascriptVMTimeout": 10000,
+  "streamNodes": [
+    "https://api.openhive.network",
+    "https://api.hive.blog",
+    "https://anyx.io",
+    "https://api.hivekings.com"
+  ],
+  "startSteemBlock": 38287457,
+  "genesisSteemBlock": 29862600,
+  "witnessEnabled": false
 }
