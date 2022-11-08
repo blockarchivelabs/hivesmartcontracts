@@ -429,7 +429,7 @@ const throttledGetBlock = async (blockNumber) => {
 };
 
 // start at index 1, and rotate.
-const lookaheadBufferSize = 100;
+const lookaheadBufferSize = 1000;
 let lookaheadStartIndex = 0;
 let lookaheadStartBlock = currentHiveBlock;
 let blockLookaheadBuffer = Array(lookaheadBufferSize);

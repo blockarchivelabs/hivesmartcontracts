@@ -185,7 +185,7 @@ class Bootstrap {
         "null",
         "tokens",
         "create",
-        `{ "name": "Hive Engine Token", "symbol": "${CONSTANTS.UTILITY_TOKEN_SYMBOL}", "precision": ${CONSTANTS.UTILITY_TOKEN_PRECISION}, "maxSupply": "${Number.MAX_SAFE_INTEGER}", "isSignedWithActiveKey": true }`
+        `{ "name": "Steem Engine Token", "symbol": "${CONSTANTS.UTILITY_TOKEN_SYMBOL}", "precision": ${CONSTANTS.UTILITY_TOKEN_PRECISION}, "maxSupply": "${Number.MAX_SAFE_INTEGER}", "isSignedWithActiveKey": true }`
       )
     );
     transactions.push(
@@ -215,7 +215,7 @@ class Bootstrap {
         "null",
         "tokens",
         "updateMetadata",
-        `{"symbol":"${CONSTANTS.UTILITY_TOKEN_SYMBOL}", "metadata": { "url":"https://hive-engine.com", "icon": "https://s3.amazonaws.com/steem-engine/images/icon_steem-engine_gradient.svg", "desc": "BEE is the native token for the Hive Engine platform" }}`
+        `{"symbol":"${CONSTANTS.UTILITY_TOKEN_SYMBOL}", "metadata": { "url":"https://hive-engine.com", "icon": "https://s3.amazonaws.com/steem-engine/images/icon_steem-engine_gradient.svg", "desc": "STEEMP is the native token for the Steem Engine platform" }}`
       )
     );
     transactions.push(
@@ -235,7 +235,7 @@ class Bootstrap {
         CONSTANTS.STEEM_PEGGED_ACCOUNT,
         "tokens",
         "create",
-        `{ "name": "HIVE Pegged", "symbol": "${CONSTANTS.STEEM_PEGGED_SYMBOL}", "precision": 8, "maxSupply": "${Number.MAX_SAFE_INTEGER}", "isSignedWithActiveKey": true }`
+        `{ "name": "STEEM Pegged", "symbol": "${CONSTANTS.STEEM_PEGGED_SYMBOL}", "precision": 8, "maxSupply": "${Number.MAX_SAFE_INTEGER}", "isSignedWithActiveKey": true }`
       )
     );
     transactions.push(
@@ -245,7 +245,7 @@ class Bootstrap {
         CONSTANTS.STEEM_PEGGED_ACCOUNT,
         "tokens",
         "updateMetadata",
-        '{"symbol":"STEEMP", "metadata": { "desc": "HIVE backed by the hive-engine team" }}'
+        '{"symbol":"STEEMP", "metadata": { "desc": "STEEM backed by the steem-engine team" }}'
       )
     );
     transactions.push(
@@ -266,6 +266,132 @@ class Bootstrap {
         "tokens",
         "updateParams",
         `{ "tokenCreationFee": "${CONSTANTS.INITIAL_TOKEN_CREATION_FEE}", "enableDelegationFee": "${CONSTANTS.INITIAL_DELEGATION_ENABLEMENT_FEE}", "enableStakingFee": "${CONSTANTS.INITIAL_STAKING_ENABLEMENT_FEE}" }`
+      )
+    );
+
+    // SCT
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "create",
+        `{ "name": "steemcoinpan token", "symbol": "SCT", "precision": 3, "maxSupply": "10000000000", "isSignedWithActiveKey": true }`
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        CONSTANTS.STEEM_PEGGED_ACCOUNT,
+        "tokens",
+        "updateMetadata",
+        '{"symbol":"SCT", "metadata": { "desc": "steemcoinpan token" }}'
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "enableStaking",
+        `{ "symbol": "SCT", "unstakingCooldown": 3, "numberTransactions": 4, "isSignedWithActiveKey": true }`
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "enableDelegation",
+        `{ "symbol": "SCT", "undelegationCooldown": 3, "isSignedWithActiveKey": true }`
+      )
+    );
+
+    // SCTM
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "create",
+        `{ "name": "steemcoinpan mining token", "symbol": "SCTM", "precision": 5, "maxSupply": "1000000", "isSignedWithActiveKey": true }`
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        CONSTANTS.STEEM_PEGGED_ACCOUNT,
+        "tokens",
+        "updateMetadata",
+        '{"symbol":"SCTM", "metadata": { "desc": "steemcoinpan mining token" }}'
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "enableStaking",
+        `{ "symbol": "SCTM", "unstakingCooldown": 1, "numberTransactions": 4, "isSignedWithActiveKey": true }`
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "enableDelegation",
+        `{ "symbol": "SCTM", "undelegationCooldown": 1, "isSignedWithActiveKey": true }`
+      )
+    );
+
+    // KRWP
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "create",
+        `{ "name": "krwp", "symbol": "KRWP", "precision": 3, "maxSupply": "100000000", "isSignedWithActiveKey": true }`
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        CONSTANTS.STEEM_PEGGED_ACCOUNT,
+        "tokens",
+        "updateMetadata",
+        '{"symbol":"KRWP", "metadata": { "desc": "krwp" }}'
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "enableStaking",
+        `{ "symbol": "KRWP", "unstakingCooldown": 3, "numberTransactions": 4, "isSignedWithActiveKey": true }`
+      )
+    );
+    transactions.push(
+      new Transaction(
+        genesisSteemBlock,
+        0,
+        "sct",
+        "tokens",
+        "enableDelegation",
+        `{ "symbol": "KRWP", "undelegationCooldown": 3, "isSignedWithActiveKey": true }`
       )
     );
 
