@@ -26,31 +26,6 @@ const createGenesisBlock = async (payload) => {
     // insert the genesis block
     const { chainId, genesisSteemBlock } = payload;
 
-    const tokenBalances = database.database.collection("tokens_balances");
-    tokenBalances.insertOne({
-      _id: 5,
-      account: "sct",
-      symbol: "STEEMP",
-      balance: "10000",
-      stake: "0",
-      pendingUnstake: "0",
-      delegationsIn: "0",
-      delegationsOut: "0",
-      pendingUndelegations: "0",
-    });
-
-    tokenBalances.insertOne({
-      _id: 6,
-      account: "sct",
-      symbol: "ENG",
-      balance: "10000",
-      stake: "0",
-      pendingUnstake: "0",
-      delegationsIn: "0",
-      delegationsOut: "0",
-      pendingUndelegations: "0",
-    });
-
     const genesisTransactions = await Bootstrap.getBootstrapTransactions(
       genesisSteemBlock
     );
@@ -76,6 +51,30 @@ const createGenesisBlock = async (payload) => {
     );
     await genesisBlock.produceBlock(database, javascriptVMTimeout);
 
+    const tokenBalances = database.database.collection("tokens_balances");
+    await tokenBalances.insertOne({
+      _id: 5,
+      account: "sct",
+      symbol: "STEEMP",
+      balance: "10000",
+      stake: "0",
+      pendingUnstake: "0",
+      delegationsIn: "0",
+      delegationsOut: "0",
+      pendingUndelegations: "0",
+    });
+
+    await tokenBalances.insertOne({
+      _id: 6,
+      account: "sct",
+      symbol: "ENG",
+      balance: "10000",
+      stake: "0",
+      pendingUnstake: "0",
+      delegationsIn: "0",
+      delegationsOut: "0",
+      pendingUndelegations: "0",
+    });
     await database.insertGenesisBlock(genesisBlock);
   }
 };
