@@ -6,7 +6,7 @@
   "databaseName": "ssc",
   "blocksLogFilePath": "./blocks.log",
   "javascriptVMTimeout": 10000,
-  "streamNodes": ["https://api.steemit.com", "https://api.upvu.org"],
+  "streamNodes": ["https://api.steemit.com"],
   "startSteemBlock": 32890061,
   "genesisSteemBlock": 32890061,
   "witnessEnabled": true,

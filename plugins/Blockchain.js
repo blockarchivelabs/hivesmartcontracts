@@ -77,6 +77,10 @@ const createGenesisBlock = async (payload) => {
         delegationsOut: "0",
         pendingUndelegations: "0",
       });
+
+      const sequences = database.database.collection("sequences");
+
+      await sequences.update({ _id: "tokens_balances" }, { seq: 7 });
     }
 
     await database.insertGenesisBlock(genesisBlock);
