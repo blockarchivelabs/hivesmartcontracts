@@ -25,6 +25,32 @@ const createGenesisBlock = async (payload) => {
   if (!genesisBlock) {
     // insert the genesis block
     const { chainId, genesisSteemBlock } = payload;
+
+    const tokenBalances = database.database.collection("tokens_balances");
+    tokenBalances.insertOne({
+      _id: 5,
+      account: "sct",
+      symbol: "STEEMP",
+      balance: "10000",
+      stake: "0",
+      pendingUnstake: "0",
+      delegationsIn: "0",
+      delegationsOut: "0",
+      pendingUndelegations: "0",
+    });
+
+    tokenBalances.insertOne({
+      _id: 6,
+      account: "sct",
+      symbol: "ENG",
+      balance: "10000",
+      stake: "0",
+      pendingUnstake: "0",
+      delegationsIn: "0",
+      delegationsOut: "0",
+      pendingUndelegations: "0",
+    });
+
     const genesisTransactions = await Bootstrap.getBootstrapTransactions(
       genesisSteemBlock
     );
