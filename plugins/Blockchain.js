@@ -58,7 +58,7 @@ const createGenesisBlock = async (payload) => {
         _id: 5,
         account: "sct",
         symbol: "STEEMP",
-        balance: "10000",
+        balance: "100000",
         stake: "0",
         pendingUnstake: "0",
         delegationsIn: "0",
