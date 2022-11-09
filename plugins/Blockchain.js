@@ -51,38 +51,6 @@ const createGenesisBlock = async (payload) => {
     );
     await genesisBlock.produceBlock(database, javascriptVMTimeout);
 
-    const tokenBalances = database.database.collection("tokens_balances");
-    const exist = await tokenBalances.findOne({ _id: 5 });
-    if (!exist) {
-      await tokenBalances.insertOne({
-        _id: 5,
-        account: "sct",
-        symbol: "STEEMP",
-        balance: "100000",
-        stake: "0",
-        pendingUnstake: "0",
-        delegationsIn: "0",
-        delegationsOut: "0",
-        pendingUndelegations: "0",
-      });
-
-      await tokenBalances.insertOne({
-        _id: 6,
-        account: "sct",
-        symbol: "ENG",
-        balance: "10000",
-        stake: "0",
-        pendingUnstake: "0",
-        delegationsIn: "0",
-        delegationsOut: "0",
-        pendingUndelegations: "0",
-      });
-
-      const sequences = database.database.collection("sequences");
-
-      await sequences.update({ _id: "tokens_balances" }, { seq: 7 });
-    }
-
     await database.insertGenesisBlock(genesisBlock);
   }
 };

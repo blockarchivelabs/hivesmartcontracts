@@ -323,13 +323,6 @@ class Block {
     const { sender, contract, action, payload } = transaction;
     let results = null;
 
-    if (
-      transaction.refSteemBlockNumber == 32890218 &&
-      transaction.sender == "sct"
-    ) {
-      console.log(transaction);
-    }
-
     let newCurrentDatabaseHash = currentDatabaseHash;
 
     // init the database hash for that transactions
